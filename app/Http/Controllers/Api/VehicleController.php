@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Carbon\Carbon;  
+use Carbon\Carbon;
 use App\Models\Vehicle;
 use App\Models\BidStage;
 class VehicleController extends Controller
@@ -77,5 +77,31 @@ class VehicleController extends Controller
             ]);
         }
 
+    }
+
+    public function storeUrls(Request $request)
+    {
+        \Log::info("storeURLs Called");
+        $last_vehicle_id = "";
+        $last_vehicle_url = "file:///home/wanjohi/Downloads/bid_success.html";
+
+        // For each object, find vehicle where phillips_account_id is like to the object -> id;
+        foreach ($request->all() as $vehicleData) {
+            \Log::info($vehicleData);
+            $vehicle = Vehicle::query()
+                // ->where('phillips_vehicle_id', $vehicleData->url)
+                ->where('phillips_vehicle_id', 'LIKE', $vehicleData['id'] . '%')
+                ->first();
+            $vehicle->url = $vehicleData['url'];
+            $vehicle->push();
+
+            $last_vehicle_id = $vehicle->id;
+            // $last_vehicle_url = $vehicle -> url;
+            \Log::info($vehicle);
+        }
+        return response()->json([
+            'last_vehicle_id' => $last_vehicle_id,
+            'last_vehicle_url' => $last_vehicle_url
+        ]);
     }
 }

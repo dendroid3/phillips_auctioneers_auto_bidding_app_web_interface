@@ -4,11 +4,13 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\AuctionSession;
+use App\Models\BidStage;
 use App\Models\PhillipsAccount;
 use Illuminate\Http\Request;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use App\Http\Resources\VehicleResource;
+use App\Http\Resources\AuctionSessionResource;
 
 class AuctionSessionController extends Controller
 {
@@ -18,17 +20,8 @@ class AuctionSessionController extends Controller
         $decodedTitle = urldecode($request->id);
         $normalizedTitle = trim(preg_replace('/\s+/', ' ', $decodedTitle));
 
-        // Eager load all necessary relationships
-        $auction = AuctionSession::with([
-            'vehicles' => function ($query) {
-                $query->latest('updated_at'); // Sort by updated_at in descending order
-            },
-            'vehicles.bidStages',
-            'vehicles.bids' => function ($query) {
-                $query->latest();
-            },
-            'vehicles.activeBidStage'
-        ])->where('title', $normalizedTitle)->first();
+        $auction = AuctionSession::query()->where('title', $normalizedTitle)->first();
+        $bidStages = $auction->bidStages;
 
         if (!$auction) {
             return response()->json(['error' => 'Auction not found'], 404);
@@ -40,7 +33,9 @@ class AuctionSessionController extends Controller
             'id' => $auction->id,
             'title' => $auction->title,
             'date' => $auction->date,
+            'status' => $auction->status,
             'phillips_accounts_emails' => $phillips_accounts_emails,
+            'bid_stages' => $bidStages,
             'vehicles' => VehicleResource::collection($auction->vehicles)
         ];
 
@@ -154,5 +149,70 @@ class AuctionSessionController extends Controller
             $auction_id;
 
         \Log::info($command);
+    }
+
+    public function updateBidStages(Request $request)
+    {
+        \Log::info($request->all());
+
+        $stages = $request->all();
+
+        foreach ($stages as $stage) {
+            $stage_to_be_updated = BidStage::find($stage['id']);
+            $stage_to_be_updated->start_time = $stage['start_time'];
+            $stage_to_be_updated->end_time = $stage['end_time'];
+            $stage_to_be_updated->push();
+        }
+
+        // Update Auction Session to configured
+        $auction_session = AuctionSession::find($request->all()[0]['auction_session_id']);
+        $auction_session->status = 'configured';
+        $auction_session->push();
+
+        // Update all vehicles to configurable
+        $vehicles = $auction_session->vehicles;
+
+        foreach ($vehicles as $vehicle) {
+            $vehicle->status = 'unconfigured';
+            $vehicle->push();
+        }
+
+        return response()->json([
+            "message" => "Bid stages times have been successfully updated. You can now configure the vehicles"
+        ]);
+    }
+
+    public function initialize(Request $request)
+    {
+        \Log::info("CAlled");
+        // Call script
+        $email = $request->all()[0]['email'];
+        $password = $request->all()[0]['password'];
+
+        $cmd = "node " . '/home/wanjohi/Code/web/phillips/puppeteer/initAuctionSession.js' .
+            " --email=" . escapeshellarg($email) .
+            " --password=" . escapeshellarg($password) .
+            " 2>&1";
+        // " > /dev/null 2>&1 &";
+
+        exec($cmd, $output, $returnCode);
+        \Log::info("Output: " . print_r($output, true));
+        \Log::info("Return Code: " . $returnCode);
+
+        return response()->json([
+            "id" => ceil(rand(1, 10) * 32874),
+            "description" => "request to initialize received, we are running tests in the background, and initialize the auction session if all the tests pass",
+            "type" => "success",
+            "title" => "Initialization Pending"
+        ]);
+    }
+
+    public function processInitTestResults(Request $request)
+    {
+        \Log::info($request -> all());
+    }
+    public function processNewEmail(Request $request)
+    {
+        \Log::info($request->all());
     }
 }

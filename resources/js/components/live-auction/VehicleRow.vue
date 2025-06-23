@@ -49,8 +49,8 @@ const props = defineProps({
     isAuctionConfigurable: {
         type: Boolean,
         required: true,
-        default: () => (false)
-    }
+        default: () => false,
+    },
 });
 
 dayjs.extend(relativeTime);
@@ -222,11 +222,6 @@ const saveChanges = async () => {
         console.error('Save failed', error);
     }
 };
-
-const randomTotal = () => {
-    let random = Math.ceil(Math.random()*10)
-    return random
-}
 </script>
 
 <template>
@@ -234,9 +229,13 @@ const randomTotal = () => {
     <TableRow>
         <TableCell
             class="group relative w-30 cursor-pointer border-l-4 font-medium"
-            :class="modelValue.status == 'highest' || modelValue.status == 'active' ? 'border-green-500' 
-            : modelValue.status == 'outbidded' ? 'border-amber-500' 
-            : 'border-red-500'"
+            :class="
+                modelValue.status == 'highest' || modelValue.status == 'active'
+                    ? 'border-green-500'
+                    : modelValue.status == 'outbidded'
+                      ? 'border-amber-500'
+                      : 'border-red-500'
+            "
         >
             <!-- Beeping Notification Button - Only for "Highest" status -->
             <div v-if="modelValue.status === 'Highest'" class="absolute top-0 right-0 translate-x-1/2 -translate-y-1/2 transform">
@@ -282,7 +281,7 @@ const randomTotal = () => {
                 />
             </div>
         </TableCell>
-        <TableCell v-if="!isAuctionConfigurable"> {{ randomTotal() }} </TableCell>
+        <TableCell v-if="!isAuctionConfigurable"> {{ modelValue.bids.length }} </TableCell>
         <TableCell class="cursor-pointer">
             <div class="flex">
                 {{ formatKES(modelValue.current_bid) }}
@@ -299,48 +298,19 @@ const randomTotal = () => {
                 </div>
             </div>
         </TableCell>
-        <TableCell :class="modelValue.status == 'highest' || modelValue.status == 'active' ? 'text-green-500' : modelValue.status == 'Outbidded' ? 'text-amber-500' : 'text-red-500'">
+        <TableCell
+            :class="
+                modelValue.status == 'highest' || modelValue.status == 'active'
+                    ? 'text-green-500'
+                    : modelValue.status == 'Outbidded'
+                      ? 'text-amber-500'
+                      : 'text-red-500'
+            "
+        >
             {{ modelValue.status }}
         </TableCell>
         <TableCell>
             <div class="flex flex-col space-y-2">
-                <!-- Start Time Input -->
-                <div class="relative">
-                    <input
-                        type="time"
-                        :value="modelValue.lazy_stage.start_time"
-                        @input="updateTime($event.target.value, 'lazy_stage.start_time')"
-                        @focus="$event.target.showPicker()"
-                        disabled
-                        class="w-35 rounded-md border border-gray-300 bg-yellow-900 px-2 py-1 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
-                    />
-                    <span
-                        v-if="!modelValue.lazy_stage.start_time"
-                        class="pointer-events-none absolute top-1/2 left-2 -translate-y-1/2 text-sm text-gray-400"
-                    >
-                        12:00 PM
-                    </span>
-                </div>
-
-                <!-- End Time Input -->
-                <div class="relative">
-                    <input
-                        :disabled="!isAuctionConfigurable"
-                        :class="!isAuctionConfigurable ? ' bg-yellow-900' : ''"
-                        type="time"
-                        :value="modelValue.lazy_stage.end_time"
-                        @input="updateTime($event.target.value, 'lazy_stage.end_time')"
-                        @focus="$event.target.showPicker()"
-                        class="w-35 rounded-md border border-gray-300 px-2 py-1 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
-                    />
-                    <span
-                        v-if="!modelValue.lazy_stage.end_time"
-                        class="pointer-events-none absolute top-1/2 left-2 -translate-y-1/2 text-sm text-gray-400"
-                    >
-                        1:00 PM
-                    </span>
-                </div>
-
                 <!-- Amount Input -->
                 <div class="relative">
                     <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
@@ -348,10 +318,10 @@ const randomTotal = () => {
                     </div>
                     <input
                         :disabled="!isAuctionConfigurable"
-                        :class="!isAuctionConfigurable ? ' bg-yellow-900' : ''"
+                        :class="!isAuctionConfigurable ? 'bg-yellow-900' : ''"
                         type="number"
                         @keydown="preventNonNumericInput"
-                        :value="modelValue.lazy_stage.increment"
+                        :value="modelValue.lazy_stage_increment"
                         @input="updateAmount($event.target.value, 'increment', 'lazy_stage.increment')"
                         placeholder="4,000"
                         class="w-35 rounded-md border border-gray-300 px-2 py-1 pl-10 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
@@ -361,43 +331,6 @@ const randomTotal = () => {
         </TableCell>
         <TableCell>
             <div class="flex flex-col space-y-2">
-                <!-- Start Time Input -->
-                <div class="relative">
-                    <input
-                        type="time"
-                        :value="modelValue.aggressive_stage.start_time"
-                        @input="updateTime($event.target.value, 'aggressive_stage.start_time')"
-                        @focus="$event.target.showPicker()"
-                        disabled
-                        class="w-35 rounded-md border border-gray-300 bg-yellow-900 px-2 py-1 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
-                    />
-                    <span
-                        v-if="!modelValue.aggressive_stage.start_time"
-                        class="pointer-events-none absolute top-1/2 left-2 -translate-y-1/2 text-sm text-gray-400"
-                    >
-                        12:00 PM
-                    </span>
-                </div>
-
-                <!-- End Time Input -->
-                <div class="relative">
-                    <input
-                        :disabled="!isAuctionConfigurable"
-                        :class="!isAuctionConfigurable ? ' bg-yellow-900' : ''"
-                        type="time"
-                        :value="modelValue.aggressive_stage.end_time"
-                        @input="updateTime($event.target.value, 'aggressive_stage.end_time')"
-                        @focus="$event.target.showPicker()"
-                        class="w-35 rounded-md border border-gray-300 px-2 py-1 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
-                    />
-                    <span
-                        v-if="!modelValue.aggressive_stage.end_time"
-                        class="pointer-events-none absolute top-1/2 left-2 -translate-y-1/2 text-sm text-gray-400"
-                    >
-                        1:00 PM
-                    </span>
-                </div>
-
                 <!-- Amount Input -->
                 <div class="relative">
                     <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
@@ -405,9 +338,9 @@ const randomTotal = () => {
                     </div>
                     <input
                         :disabled="!isAuctionConfigurable"
-                        :class="!isAuctionConfigurable ? ' bg-yellow-900' : ''"
+                        :class="!isAuctionConfigurable ? 'bg-yellow-900' : ''"
                         type="number"
-                        :value="modelValue.aggressive_stage.increment"
+                        :value="modelValue.aggressive_stage_increment"
                         @input="updateAmount($event.target.value, 'increment', 'aggressive_stage.increment')"
                         placeholder="4,000"
                         class="w-35 rounded-md border border-gray-300 px-2 py-1 pl-10 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
@@ -417,53 +350,17 @@ const randomTotal = () => {
         </TableCell>
         <TableCell>
             <div class="flex flex-col space-y-2">
-                <!-- Start Time Input -->
-                <div class="relative">
-                    <input
-                        type="time"
-                        :value="modelValue.sniping_stage.start_time"
-                        @input="updateTime($event.target.value, 'sniping_stage.start_time')"
-                        disabled
-                        @focus="$event.target.showPicker()"
-                        class="w-35 rounded-md border border-gray-300 bg-yellow-900 px-2 py-1 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
-                    />
-                    <span
-                        v-if="!modelValue.sniping_stage.start_time"
-                        class="pointer-events-none absolute top-1/2 left-2 -translate-y-1/2 text-sm text-gray-400"
-                    >
-                        12:00 PM
-                    </span>
-                </div>
-
-                <!-- End Time Input -->
-                <div class="relative">
-                    <input
-                        type="time"
-                        :value="modelValue.sniping_stage.end_time"
-                        @input="updateTime($event.target.value, 'sniping_stage.end_time')"
-                        @focus="$event.target.showPicker()"
-                        disabled
-                        class="w-35 rounded-md border border-gray-300 bg-yellow-900 px-2 py-1 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
-                    />
-                    <span
-                        v-if="!modelValue.sniping_stage.end_time"
-                        class="pointer-events-none absolute top-1/2 left-2 -translate-y-1/2 text-sm text-gray-400"
-                    >
-                        1:00 PM
-                    </span>
-                </div>
-
                 <!-- Amount Input -->
-                <div class="relative" >
+                <div class="relative">
                     <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
                         <span class="text-gray-500 sm:text-sm">Ksh</span>
                     </div>
                     <input
                         :disabled="!isAuctionConfigurable"
-                        :class="!isAuctionConfigurable ? ' bg-yellow-900' : ''"
+                        :class="!isAuctionConfigurable ? 'bg-yellow-900' : ''"
                         type="number"
                         @keydown="preventNonNumericInput"
-                        :value="modelValue.sniping_stage.increment"
+                        :value="modelValue.sniping_stage_increment"
                         @input="updateAmount($event.target.value, 'increment', 'sniping_stage.increment')"
                         placeholder="4,000"
                         class="w-35 rounded-md border border-gray-300 px-2 py-1 pl-10 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
@@ -472,7 +369,9 @@ const randomTotal = () => {
             </div>
         </TableCell>
         <TableCell v-if="isAuctionConfigurable">
-            <Button class="cursor-pointer" :class="changeMade ? 'bg-green-500' : ''" :disabled="!changeMade" @click="saveChanges" loading> Save </Button>
+            <Button class="cursor-pointer" :class="changeMade ? 'bg-green-500' : ''" :disabled="!changeMade" @click="saveChanges" loading>
+                Save
+            </Button>
             <br />
             <Button class="my-2 cursor-pointer bg-green-500"> Force Bid </Button>
             <br />

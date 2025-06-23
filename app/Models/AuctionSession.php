@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Psy\CodeCleaner\FunctionContextPass;
+use App\Events\AuctionSessionCreatedEvent;
 
 class AuctionSession extends Model
 {
@@ -21,4 +22,13 @@ class AuctionSession extends Model
     {
         return $this->hasMany(Vehicle::class);
     }
+
+    public function bidStages ()
+    {
+        return $this->hasMany(BidStage::class);
+    }
+
+     protected $dispatchesEvents = [
+        'saved' => AuctionSessionCreatedEvent::class,
+    ];
 }

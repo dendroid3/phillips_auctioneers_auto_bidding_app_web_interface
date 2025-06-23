@@ -9,19 +9,16 @@ use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
-use App\Models\Vehicle;
+use App\Models\AuctionSession;
 
-class VehicleCreatedEvent
+class AuctionSessionCreatedEvent
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public $vehicle;
-    /**
-     * Create a new event instance.
-     */
-    public function __construct(Vehicle $vehicle)
+    public $AuctionSession;
+    public function __construct(AuctionSession $auctionSession)
     {
-        $this->vehicle = $vehicle;
+        $this -> AuctionSession = $auctionSession;
     }
 
     /**

@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { Button } from '@/components/ui/button';
 import axios from 'axios';
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, defineEmits } from 'vue';
+import AuctionStagesConfigurationTable from '../widgets/AuctionStagesConfigurationTable.vue';
 import InitiatizationPopover from '../widgets/InitiatizationPopover.vue';
 import Progress from '../widgets/Progress.vue';
 import VehiclesTable from './VehiclesTable.vue';
@@ -12,6 +13,21 @@ const auction = ref({
     vehicles: [],
 });
 
+const stages = ref([]);
+
+const transformStages = (stagesArray) => {
+    return {
+        lazy_stage: stagesArray.find((s) => s.name === 'lazy'),
+        aggressive_stage: stagesArray.find((s) => s.name === 'aggressive'),
+        sniping_stage: stagesArray.find((s) => s.name === 'sniping'),
+    };
+};
+
+const emit = defineEmits(['initialization:started'])
+
+const handleInitilizationStarted = (response) => {
+    emit('initialization:started', response)
+}
 const fetchAuctionDetails = async () => {
     try {
         const path = window.location.pathname;
@@ -28,8 +44,22 @@ const fetchAuctionDetails = async () => {
             // Ensure vehicles exists even if API doesn't return it
             vehicles: response.data.vehicles || [],
         };
+        stages.value = auction.value.bid_stages;
+        console.log('auction');
+        console.log(auction.value.bid_stages[0]);
     } catch (error) {
         console.log(error);
+    }
+};
+
+const handleTimeUpdate = ({ stageName, field, value }) => {
+    const stageIndex = stages.value.findIndex((s) => s.name === stageName);
+    if (stageIndex !== -1) {
+        stages.value[stageIndex][field] = value;
+
+        // If you need to update the transformed stages reference:
+        const updatedStages = transformStages(stages.value);
+        // Use updatedStages if needed for other purposes
     }
 };
 
@@ -54,6 +84,12 @@ const saveAllVehicles = async () => {
     }
 };
 
+const handleSaveTime = async () => {
+    const response = await axios.post("/api/auction/bid_stages/update", stages.value)
+    await fetchAuctionDetails();
+    alert(response.data.message);
+    await console.log(stages.value);
+}
 // Expose the save method to child components
 defineExpose({
     saveAllVehicles,
@@ -65,7 +101,7 @@ function hasDatePassed(dateString) {
     // const todayUTC = Date.UTC(today.getFullYear(), today.getMonth(), today.getDate());
 
     // return inputDate.getTime() < todayUTC;
-    if (dateString == '2025-06-05') {
+    if (dateString == '2025-06-19') {
         return false;
     }
 
@@ -99,7 +135,11 @@ function hasDatePassed(dateString) {
                 </svg>
                 Bomb!
             </Button>
-            <InitiatizationPopover :phillips_accounts_emails="auction.phillips_accounts_emails"/>
+            <InitiatizationPopover :phillips_accounts_emails="auction.phillips_accounts_emails" @initialization:started="handleInitilizationStarted"/>
+        </div>
+
+        <div class="flex w-full justify-center p-4" v-if="!hasDatePassed(auction.date)">
+            <AuctionStagesConfigurationTable :stages="transformStages(stages)" :isAuctionConfigurable="true" @update:time="handleTimeUpdate" @save:time="handleSaveTime"/>
         </div>
         <div class="relative">
             <VehiclesTable

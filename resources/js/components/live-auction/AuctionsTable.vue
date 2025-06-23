@@ -33,7 +33,7 @@ onMounted(async () => {
     <div v-else>
         <div class="mb-4 flex justify-center">
             <Button class="cursor-pointer bg-green-500 text-white">
-                Force Scrape vehicles
+                Force Scrape Auctions
                 <!-- <Loader2 className="mr-2 h-4 w-4 animate-spin" /> -->
             </Button>
         </div>
@@ -50,6 +50,7 @@ onMounted(async () => {
                     <TableHead>Won</TableHead>
                     <TableHead>Lost</TableHead>
                     <TableHead>Out Budgeted</TableHead>
+                
                 </TableRow>
             </TableHeader>
             <TableBody class="max-h-[80vh] min-h-[80vh] overflow-y-auto">

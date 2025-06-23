@@ -34,7 +34,6 @@ const handleVehicleUpdateInDB = () => {
 
 <template>
     <div>
-        
         <Table>
             <TableCaption>A list of vehicles in the auction.</TableCaption>
             <TableHeader>

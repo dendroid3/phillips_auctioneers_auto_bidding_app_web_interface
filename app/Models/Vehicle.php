@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use App\Events\VehicleCreatedEvent;
 
 class Vehicle extends Model
 {
@@ -29,17 +28,8 @@ class Vehicle extends Model
         return $this->hasMany(Bid::class);
     }
 
-    public function bidStages()
+    public function phillipsAccount()
     {
-        return $this->hasMany(BidStage::class);
+        return $this->belongsTo(PhillipsAccount::class);
     }
-
-    public function activeBidStage()
-    {
-        return $this->hasOne(BidStage::class)->where('status', 'active');
-    }
-
-    protected $dispatchesEvents = [
-        'saved' => VehicleCreatedEvent::class,
-    ];
 }

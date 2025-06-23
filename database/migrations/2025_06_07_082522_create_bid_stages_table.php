@@ -13,11 +13,10 @@ return new class extends Migration
     {
         Schema::create('bid_stages', function (Blueprint $table) {
             $table->id();
-            $table->unsignedInteger('vehicle_id')->index();
+            $table->unsignedInteger('auction_session_id')->index();
             $table->string('name');
             $table->time('start_time');
             $table->time('end_time');
-            $table->integer('increment');
             $table->string('status')->default('dormant');
             $table->timestamps();
         });

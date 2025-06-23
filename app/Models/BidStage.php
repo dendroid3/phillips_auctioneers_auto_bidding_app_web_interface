@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class BidStage extends Model
 {   
     protected $fillable = [
-        'vehicle_id',
+        'auction_session_id',
         'name',
         'start_time',
         'end_time',
@@ -20,9 +20,9 @@ class BidStage extends Model
         return $this->hasMany(Bid::class);
     }
 
-    public function vehicle ()
+    public function auction_session ()
     {
-        return $this->belongsTo(Vehicle::class);
+        return $this->belongsTo(AuctionSession::class);
     }
 
     /**

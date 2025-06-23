@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Events\BidCreatedEvent;
 use Illuminate\Database\Eloquent\Model;
 
 class Bid extends Model
@@ -14,13 +15,17 @@ class Bid extends Model
         'amount'
     ];
 
-    public function bidStage ()
+    public function bidStage()
     {
         return $this->belongsTo(BidStage::class);
     }
 
-    public function vehicle ()
+    public function vehicle()
     {
         return $this->belongsTo(Vehicle::class);
     }
+
+    protected $dispatchesEvents = [
+        'saved' => BidCreatedEvent::class
+    ];
 }

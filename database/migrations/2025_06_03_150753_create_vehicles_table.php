@@ -14,12 +14,16 @@ return new class extends Migration
         Schema::create('vehicles', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('auction_session_id')->index();
+            $table->unsignedBigInteger('phillips_account_id')->nullable()->index();
             $table->string('phillips_vehicle_id');
             $table->string('url')->nullable();
             $table->integer('current_bid')->nullable();
             $table->integer('start_amount')->nullable();
             $table->integer('maximum_amount')->nullable();
-            $table->string('status')->default('unconfigured');
+            $table->integer('lazy_stage_increment')->nullable();
+            $table->integer('aggressive_stage_increment')->nullable();
+            $table->integer('sniping_stage_increment')->nullable();
+            $table->string('status')->default('unconfigurable ');
             $table->timestamps();
         }); 
     }

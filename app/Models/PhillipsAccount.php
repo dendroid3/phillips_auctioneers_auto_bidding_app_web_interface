@@ -18,8 +18,13 @@ class PhillipsAccount extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function Bids () 
+    public function bids () 
     {
         return $this->hasMany(Bid::class);
+    }
+
+    public function vehicles () 
+    {
+        return $this->hasMany(Vehicle::class);
     }
 }
