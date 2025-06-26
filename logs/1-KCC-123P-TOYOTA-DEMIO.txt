@@ -1,0 +1,28 @@
+------------------------------------------------------
+LOGS FOR VEHICLE 1 KCC-123P-TOYOTA-DEMIO
+------------------------------------------------------
+
+------------------------------------------------------
+10:46:11: We've began bidding, first sprint:
+Stage: lazy stage
+Account: Denis@.com
+Increment: 2500
+------------------------------------------------------
+10:46:12, INFO: Navigating to login page
+10:46:21, INFO: Entering credentials
+10:46:22, INFO: Submitting login form
+10:46:32, ERROR: Navigation timeout of 10000 ms exceeded
+10:46:32, SUCCESS: Sprint Complete
+
+
+------------------------------------------------------
+10:49:27: We've been outbid, another sprint:
+Stage: lazy stage
+Account: Denis@.com
+Increment: 2500
+------------------------------------------------------
+10:49:28, INFO: Navigating to login page
+10:50:10, INFO: Entering credentials
+10:50:10, INFO: Submitting login form
+10:50:20, ERROR: Navigation timeout of 10000 ms exceeded
+10:50:20, SUCCESS: Sprint Complete

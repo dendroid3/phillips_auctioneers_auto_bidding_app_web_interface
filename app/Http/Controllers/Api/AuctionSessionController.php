@@ -12,6 +12,8 @@ use Symfony\Component\Process\Exception\ProcessFailedException;
 use App\Http\Resources\VehicleResource;
 use App\Http\Resources\AuctionSessionResource;
 
+use App\Jobs\PlaceBid;
+
 class AuctionSessionController extends Controller
 {
 
@@ -44,7 +46,7 @@ class AuctionSessionController extends Controller
     public function getAll()
     {
         $auctions = AuctionSession::query()
-            ->orderBy('updated_at', 'asc')
+            ->orderBy('date', 'desc')
             ->withCount([
                 'vehicles as total_vehicles_count'
             ])
@@ -184,7 +186,10 @@ class AuctionSessionController extends Controller
 
     public function initialize(Request $request)
     {
-        \Log::info("CAlled");
+        \Log::info("Called");
+        foreach ($request -> email as $key => $value) {
+            # code...
+        }
         // Call script
         $email = $request->all()[0]['email'];
         $password = $request->all()[0]['password'];
@@ -209,10 +214,49 @@ class AuctionSessionController extends Controller
 
     public function processInitTestResults(Request $request)
     {
-        \Log::info($request -> all());
+        // TODO:
+        /**
+         * Send notification to front end
+         * Possible request.status = 200, 404, 403
+         * 
+         * If status 200:
+         * ----- Change phillip account status to pending
+         * ----- Check if there is any rejected | pending
+         * ------------- if no pending | rejected
+         * ----------------------- Send notification that auction has bee successfully initated
+         * ----------------------- Change auction status to acuve
+         * ----------------------- Change all phillips account that are pending to active
+         * If 403 || 404 change phillip account status to rejected
+         * ------- Front end to alert this so as to suspend all other activity till it is read
+         */
+        \Log::info($request->all());
     }
     public function processNewEmail(Request $request)
     {
+        // TODO:
+        /**
+         * 
+         * Request will have $url = vehicle url and $amount = Amount of bid that outbidded us
+         * 
+         * Use vehicle url to get vehicle:
+         * ---- Check vehicle bids:
+         * -------- If the last bid is === to the $request -> amount, then another one of our accounts placed the bid, do not place bid or send notification otherwise:
+         * -------------- Dispatch a place bid job, the new amount should be $request -> amount + stage_increment
+         * 
+         * 
+         */
+        PlaceBid::dispatch(
+            url: $request->url,
+            amount: 35000,
+            maximum_amount: 40000,
+            increment: 2500,
+            email: 'Denis@.com',
+            password: "ernestotieno95@gmail.com",
+            vehicle_id: 1,
+            vehicle_name: "KCC-123P-TOYOTA-DEMIO",
+            bid_stage: "lazy stage"
+        );
+
         \Log::info($request->all());
     }
 }

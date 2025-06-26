@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Button } from '@/components/ui/button';
 import axios from 'axios';
-import { onMounted, ref, defineEmits } from 'vue';
+import { defineEmits, onMounted, ref } from 'vue';
 import AuctionStagesConfigurationTable from '../widgets/AuctionStagesConfigurationTable.vue';
 import InitiatizationPopover from '../widgets/InitiatizationPopover.vue';
 import Progress from '../widgets/Progress.vue';
@@ -23,11 +23,14 @@ const transformStages = (stagesArray) => {
     };
 };
 
-const emit = defineEmits(['initialization:started'])
+const emit = defineEmits(['initialization:started']);
 
 const handleInitilizationStarted = (response) => {
-    emit('initialization:started', response)
-}
+    emit('initialization:started', response);
+};
+
+let auctionSessionFetched = ref(false);
+
 const fetchAuctionDetails = async () => {
     try {
         const path = window.location.pathname;
@@ -45,8 +48,7 @@ const fetchAuctionDetails = async () => {
             vehicles: response.data.vehicles || [],
         };
         stages.value = auction.value.bid_stages;
-        console.log('auction');
-        console.log(auction.value.bid_stages[0]);
+        auctionSessionFetched = true;
     } catch (error) {
         console.log(error);
     }
@@ -63,8 +65,10 @@ const handleTimeUpdate = ({ stageName, field, value }) => {
     }
 };
 
-onMounted(async () => {
-    await fetchAuctionDetails();
+onMounted(() => {
+    setTimeout(() => {
+        fetchAuctionDetails();
+    }, 0);
 });
 
 const updateVehicle = (updatedVehicle, index) => {
@@ -85,27 +89,22 @@ const saveAllVehicles = async () => {
 };
 
 const handleSaveTime = async () => {
-    const response = await axios.post("/api/auction/bid_stages/update", stages.value)
+    const response = await axios.post('/api/auction/bid_stages/update', stages.value);
     await fetchAuctionDetails();
     alert(response.data.message);
     await console.log(stages.value);
-}
+};
 // Expose the save method to child components
 defineExpose({
     saveAllVehicles,
 });
 
-function hasDatePassed(dateString) {
-    // const inputDate = new Date(dateString + 'T00:00:00Z');
-    // const today = new Date();
-    // const todayUTC = Date.UTC(today.getFullYear(), today.getMonth(), today.getDate());
+function isToday(dateString) {
+    const inputDate = new Date(dateString + 'T00:00:00Z');
+    const today = new Date();
+    const todayUTC = Date.UTC(today.getFullYear(), today.getMonth(), today.getDate());
 
-    // return inputDate.getTime() < todayUTC;
-    if (dateString == '2025-06-19') {
-        return false;
-    }
-
-    return true;
+    return inputDate.getTime() == todayUTC;
 }
 </script>
 <template>
@@ -122,10 +121,10 @@ function hasDatePassed(dateString) {
                 :name="`Fuck`"
                 :startTime="auction.start_time"
                 :end_time="auction.end_time"
-                v-if="!hasDatePassed(auction.date)"
+                v-if="isToday(auction.date)"
             />
         </div>
-        <div class="flex w-full justify-center p-4" v-if="!hasDatePassed(auction.date)">
+        <div class="flex w-full justify-center p-4" v-if="isToday(auction.date)">
             <Button :variant="`destructive`" class="mx-4 cursor-pointer">
                 <svg width="24" height="24" viewBox="0 0 24 24">
                     <!-- Finger curve -->
@@ -135,18 +134,27 @@ function hasDatePassed(dateString) {
                 </svg>
                 Bomb!
             </Button>
-            <InitiatizationPopover :phillips_accounts_emails="auction.phillips_accounts_emails" @initialization:started="handleInitilizationStarted"/>
+            <InitiatizationPopover
+                :phillips_accounts_emails="auction.phillips_accounts_emails"
+                @initialization:started="handleInitilizationStarted"
+            />
         </div>
 
-        <div class="flex w-full justify-center p-4" v-if="!hasDatePassed(auction.date)">
-            <AuctionStagesConfigurationTable :stages="transformStages(stages)" :isAuctionConfigurable="true" @update:time="handleTimeUpdate" @save:time="handleSaveTime"/>
+        <div class="flex w-full justify-center p-4" v-if="isToday(auction.date)">
+            <AuctionStagesConfigurationTable
+                :stages="transformStages(stages)"
+                :isAuctionConfigurable="true"
+                v-if="auctionSessionFetched"
+                @update:time="handleTimeUpdate"
+                @save:time="handleSaveTime"
+            />
         </div>
         <div class="relative">
             <VehiclesTable
                 :vehicles="auction.vehicles"
                 @update-vehicle="updateVehicle"
                 @update-vehicle-in-DB="fetchAuctionDetails"
-                :isAuctionConfigurable="!hasDatePassed(auction.date)"
+                :isAuctionConfigurable="isToday(auction.date)"
             />
         </div>
     </div>

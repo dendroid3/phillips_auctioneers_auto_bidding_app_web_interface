@@ -7,12 +7,12 @@ export function cn(...inputs: ClassValue[]) {
 
 export function useMoney() {
   const formatKES = (value) => {
-    if (!value) return "KES 0.00";
+    if (!value) return "0";
     const num = parseFloat(value.toString().replace(/[^\d.-]/g, ""));
     return new Intl.NumberFormat("en-KE", {
-      style: "currency",
-      currency: "KES",
+      style: "decimal", 
       minimumFractionDigits: 0,
+      maximumFractionDigits: 2
     }).format(num);
   };
 

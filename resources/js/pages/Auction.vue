@@ -90,6 +90,7 @@ const handleInitilizationStarted = (response) => {
                             :type="alert.type"
                             :title="alert.title"
                             :description="alert.description"
+                            :id="alert.id"
                             @dismiss="removeAlert(alert.id)"
                             class="pointer-events-auto"
                         />

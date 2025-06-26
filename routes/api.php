@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\AuctionSessionController;
 use App\Http\Controllers\Api\BidController;
 use App\Http\Controllers\Api\SnipingController;
 use App\Http\Controllers\Api\VehicleController;
+use App\Http\Controllers\Api\MonitoringController;
 use Illuminate\Support\Facades\Route;
 
 Route::group(["prefix" => "auction"], function () {
@@ -39,7 +40,7 @@ Route::group(["prefix" => "auction"], function () {
         "processInitTestResults"
     ]);
 
-    Route::group(['prefix'=> 'bid_stages'], function() {
+    Route::group(['prefix' => 'bid_stages'], function () {
         Route::post('update', [
             AuctionSessionController::class,
             "updateBidStages"
@@ -47,7 +48,7 @@ Route::group(["prefix" => "auction"], function () {
     });
 });
 
-Route::group(["prefix"=> "vehicle"], function () {    
+Route::group(["prefix" => "vehicle"], function () {
     Route::post("create", [
         VehicleController::class,
         "create"
@@ -64,17 +65,28 @@ Route::group(["prefix"=> "vehicle"], function () {
     ])->name("vehicle.storeUrl");
 });
 
-Route::group(['prefix'=> 'sniping'], function () {
+Route::group(['prefix' => 'sniping'], function () {
     Route::post('init', [
         SnipingController::class,
         "init"
     ])->name('snipping.init');
 });
 
-Route::group(['prefix' => 'bid'], function() {
+Route::group(['prefix' => 'bid'], function () {
     Route::post('create', [
         BidController::class,
         "create"
     ])->name('bid.create');
+
+    Route::get('get_all_for_auction/{id}', [
+        BidController::class,
+        "getAllForAuction"
+    ])->name('getAllForAuction');
+});
+
+Route::group(['prefix' => 'email'], function () {
+    Route::post('start', [MonitoringController::class, 'start']);
+    Route::post('stop/{email}', [MonitoringController::class, 'stop']);
+    Route::get('status', [MonitoringController::class, 'status']);
 });
 

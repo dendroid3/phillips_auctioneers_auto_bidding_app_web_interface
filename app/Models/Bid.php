@@ -25,6 +25,10 @@ class Bid extends Model
         return $this->belongsTo(Vehicle::class);
     }
 
+    public function phillipsAccount() 
+    {
+        return $this -> belongsTo(PhillipsAccount::class);
+    }
     protected $dispatchesEvents = [
         'saved' => BidCreatedEvent::class
     ];

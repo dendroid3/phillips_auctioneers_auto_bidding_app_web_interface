@@ -163,24 +163,14 @@ const updateTime = (value, nestedPath) => {
     }, 0);
 };
 
-const updateAmount = (value, field, nestedPath) => {
+const updateAmount = (value, field) => {
     changeMade.value = true;
     const newValue = {
         ...props.modelValue,
     };
 
     const index = props.index;
-
-    if (nestedPath) {
-        const [parent, child] = nestedPath.split('.');
-        newValue[parent] = {
-            ...newValue[parent],
-            [child]: String(value), // Convert to string to match your prop structure
-        };
-    } else {
-        newValue[field] = String(value);
-    }
-
+    newValue[field] = String(value);
     emit('update:modelValue', newValue, index);
 };
 
@@ -203,21 +193,23 @@ const preventNonNumericInput = (event) => {
     }
 };
 
-const parentComponent = inject('parent'); // Or use provide/inject pattern
+const parentComponent = inject('parent');
 
-// Add save method
+let isSaving = ref(false);
 const saveChanges = async () => {
     try {
-        // You can either:
-        // 1. Save just this vehicle
+        if(props.modelValue.start_amount > props.modelValue.maximum_amount){
+            alert("Maximum amount cannot be less than the start amount");
+            return;
+        }
+        isSaving = true;
         const response = await axios.put(`/api/vehicle/update`, props.modelValue);
 
         changeMade.value = false;
         alert(response.data.message);
 
-        emit('update:vehicle-in-db');
-
         console.log('Save successful');
+        isSaving = false;
     } catch (error) {
         console.error('Save failed', error);
     }
@@ -312,9 +304,10 @@ const saveChanges = async () => {
         <TableCell>
             <div class="flex flex-col space-y-2">
                 <!-- Amount Input -->
+
                 <div class="relative">
-                    <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                        <span class="text-gray-500 sm:text-sm">Ksh</span>
+                    <div class="mb-2 w-30 text-center">
+                        {{ formatKES(modelValue.lazy_stage_increment) }}
                     </div>
                     <input
                         :disabled="!isAuctionConfigurable"
@@ -322,7 +315,7 @@ const saveChanges = async () => {
                         type="number"
                         @keydown="preventNonNumericInput"
                         :value="modelValue.lazy_stage_increment"
-                        @input="updateAmount($event.target.value, 'increment', 'lazy_stage.increment')"
+                        @input="updateAmount($event.target.value, 'lazy_stage_increment')"
                         placeholder="4,000"
                         class="w-35 rounded-md border border-gray-300 px-2 py-1 pl-10 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
                     />
@@ -333,15 +326,15 @@ const saveChanges = async () => {
             <div class="flex flex-col space-y-2">
                 <!-- Amount Input -->
                 <div class="relative">
-                    <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                        <span class="text-gray-500 sm:text-sm">Ksh</span>
+                    <div class="mb-2 w-30 text-center">
+                        {{ formatKES(modelValue.aggressive_stage_increment) }}
                     </div>
                     <input
                         :disabled="!isAuctionConfigurable"
                         :class="!isAuctionConfigurable ? 'bg-yellow-900' : ''"
                         type="number"
                         :value="modelValue.aggressive_stage_increment"
-                        @input="updateAmount($event.target.value, 'increment', 'aggressive_stage.increment')"
+                        @input="updateAmount($event.target.value, 'aggressive_stage_increment')"
                         placeholder="4,000"
                         class="w-35 rounded-md border border-gray-300 px-2 py-1 pl-10 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
                     />
@@ -352,8 +345,8 @@ const saveChanges = async () => {
             <div class="flex flex-col space-y-2">
                 <!-- Amount Input -->
                 <div class="relative">
-                    <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                        <span class="text-gray-500 sm:text-sm">Ksh</span>
+                    <div class="mb-2 w-30 text-center">
+                        {{ formatKES(modelValue.sniping_stage_increment) }}
                     </div>
                     <input
                         :disabled="!isAuctionConfigurable"
@@ -361,7 +354,7 @@ const saveChanges = async () => {
                         type="number"
                         @keydown="preventNonNumericInput"
                         :value="modelValue.sniping_stage_increment"
-                        @input="updateAmount($event.target.value, 'increment', 'sniping_stage.increment')"
+                        @input="updateAmount($event.target.value, 'sniping_stage_increment')"
                         placeholder="4,000"
                         class="w-35 rounded-md border border-gray-300 px-2 py-1 pl-10 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
                     />
@@ -369,8 +362,19 @@ const saveChanges = async () => {
             </div>
         </TableCell>
         <TableCell v-if="isAuctionConfigurable">
-            <Button class="cursor-pointer" :class="changeMade ? 'bg-green-500' : ''" :disabled="!changeMade" @click="saveChanges" loading>
-                Save
+            <Button class="cursor-pointer" :class="changeMade ? 'bg-green-500' : ''" :disabled="!changeMade" @click="saveChanges">
+                <div v-if="!isSaving">Save</div>
+                <div class="flex" v-else>
+                    <svg class="mr-2 h-4 w-4 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+                        <path
+                            class="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        />
+                    </svg>
+                    <span>Saving</span>
+                </div>
             </Button>
             <br />
             <Button class="my-2 cursor-pointer bg-green-500"> Force Bid </Button>

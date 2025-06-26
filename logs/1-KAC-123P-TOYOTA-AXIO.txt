@@ -1,0 +1,26 @@
+------------------------------------------------------
+LOGS FOR VEHICLE 1 KAC-123P-TOYOTA-AXIO
+------------------------------------------------------
+
+------------------------------------------------------
+10:38:04: We've began bidding, first sprint:
+Stage: lazy stage
+Account: Denis@.com
+Increment: 2500
+------------------------------------------------------
+10:38:04, INFO: Navigating to login page
+10:39:04, ERROR: Navigation timeout of 60000 ms exceeded
+10:39:04, SUCCESS: Sprint Complete
+
+
+------------------------------------------------------
+10:43:30: We've been outbid, another sprint:
+Stage: lazy stage
+Account: Denis@.com
+Increment: 2500
+------------------------------------------------------
+10:43:31, INFO: Navigating to login page
+10:44:20, INFO: Entering credentials
+10:44:20, INFO: Submitting login form
+10:44:30, ERROR: Navigation timeout of 10000 ms exceeded
+10:44:30, SUCCESS: Sprint Complete

@@ -22,48 +22,26 @@ class VehicleController extends Controller
 
     public function update(Request $request)
     {
+        \Log::info($request -> all());
+        \Log::info($request -> aggressive_stage_increment);
         $vehicle = Vehicle::query()->where('phillips_vehicle_id', $request['id'])->first();
         $vehicle->start_amount = $request->start_amount;
         $vehicle->maximum_amount = $request->maximum_amount;
+        $vehicle->lazy_stage_increment = $request->lazy_stage_increment;
+        $vehicle->aggressive_stage_increment = $request->aggressive_stage_increment;
+        $vehicle->sniping_stage_increment = $request->sniping_stage_increment;
         $vehicle->updated_at = Carbon::now();
         $vehicle->push();
 
-        $lazy_stage = BidStage::query()->where('vehicle_id', $vehicle->id)->where('name', 'lazy')->first();
-        $lazy_stage->start_time = $request->lazy_stage['start_time'];
-        $lazy_stage->end_time = $request->lazy_stage['end_time'];
-        $lazy_stage->increment = $request->lazy_stage['increment'];
-        $lazy_stage->push();
-
-        $aggressive_stage = BidStage::query()->where('vehicle_id', $vehicle->id)->where('name', 'aggressive')->first();
-        $aggressive_stage->start_time = $request->aggressive_stage['start_time'];
-        $aggressive_stage->end_time = $request->aggressive_stage['end_time'];
-        $aggressive_stage->increment = $request->aggressive_stage['increment'];
-        $aggressive_stage->push();
-
-
-        $sniping_stage = BidStage::query()->where('vehicle_id', $vehicle->id)->where('name', 'sniping')->first();
-        $sniping_stage->start_time = $request->sniping_stage['start_time'];
-        $sniping_stage->end_time = $request->sniping_stage['end_time'];
-        $sniping_stage->increment = $request->sniping_stage['increment'];
-        $sniping_stage->push();
 
         \Log::info($vehicle);
-        \Log::info($lazy_stage);
-        \Log::info($aggressive_stage);
-        \Log::info($sniping_stage);
 
         if (
             $vehicle->start_amount &&
             $vehicle->maximum_amount &&
-            $lazy_stage->start_time &&
-            $lazy_stage->end_time &&
-            $lazy_stage->increment &&
-            $aggressive_stage->start_time &&
-            $aggressive_stage->end_time &&
-            $aggressive_stage->increment &&
-            $sniping_stage->start_time &&
-            $sniping_stage->end_time &&
-            $sniping_stage->increment
+            $vehicle->lazy_stage_increment &&
+            $vehicle->aggressive_stage_increment &&
+            $vehicle->sniping_stage_increment
         ) {
             $vehicle->status = 'active';
             $vehicle->push();
