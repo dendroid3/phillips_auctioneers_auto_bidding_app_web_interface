@@ -10,7 +10,7 @@ class SnipingController extends Controller
 {
     public function init(Request $request)
     {
-        \Log::info($request->all());
+        // \Log::info($request->all());
         $vehicles = Vehicle::query()->where(
             [
                 'auction_session_id' => 1, //$request->auction_account_id,
@@ -19,7 +19,7 @@ class SnipingController extends Controller
             ]
         )->take(3)->get();
 
-        \Log::info($vehicles);
+        // \Log::info($vehicles);
 
         return response()->json($vehicles);
     }

@@ -22,8 +22,7 @@ class VehicleController extends Controller
 
     public function update(Request $request)
     {
-        \Log::info($request -> all());
-        \Log::info($request -> aggressive_stage_increment);
+        // \Log::info($request -> all());
         $vehicle = Vehicle::query()->where('phillips_vehicle_id', $request['id'])->first();
         $vehicle->start_amount = $request->start_amount;
         $vehicle->maximum_amount = $request->maximum_amount;
@@ -32,9 +31,6 @@ class VehicleController extends Controller
         $vehicle->sniping_stage_increment = $request->sniping_stage_increment;
         $vehicle->updated_at = Carbon::now();
         $vehicle->push();
-
-
-        \Log::info($vehicle);
 
         if (
             $vehicle->start_amount &&
@@ -45,6 +41,12 @@ class VehicleController extends Controller
         ) {
             $vehicle->status = 'active';
             $vehicle->push();
+
+            $auction = $vehicle->auctionSession;
+            if ($auction->status == 'configured') {
+                $auction->status = 'active';
+                $auction->push();
+            }
 
             return response()->json([
                 "message" => $vehicle->phillips_vehicle_id . " fully configured."
@@ -59,13 +61,13 @@ class VehicleController extends Controller
 
     public function storeUrls(Request $request)
     {
-        \Log::info("storeURLs Called");
+        // \Log::info("storeURLs Called");
         $last_vehicle_id = "";
         $last_vehicle_url = "file:///home/wanjohi/Downloads/bid_success.html";
 
         // For each object, find vehicle where phillips_account_id is like to the object -> id;
         foreach ($request->all() as $vehicleData) {
-            \Log::info($vehicleData);
+            // \Log::info($vehicleData);
             $vehicle = Vehicle::query()
                 // ->where('phillips_vehicle_id', $vehicleData->url)
                 ->where('phillips_vehicle_id', 'LIKE', $vehicleData['id'] . '%')
@@ -75,11 +77,22 @@ class VehicleController extends Controller
 
             $last_vehicle_id = $vehicle->id;
             // $last_vehicle_url = $vehicle -> url;
-            \Log::info($vehicle);
+            // \Log::info($vehicle);
         }
         return response()->json([
             'last_vehicle_id' => $last_vehicle_id,
             'last_vehicle_url' => $last_vehicle_url
+        ]);
+    }
+
+    public function dropOff(Request $request)
+    {
+        $vehicle = Vehicle::query()->where('phillips_vehicle_id', $request->id)->first();
+        $vehicle -> status = 'dropped';
+        $vehicle->push();
+
+        return response() -> json([
+            "message" => $vehicle -> phillips_vehicle_id . " successfully droped, no more bids will be placed for the vehicle."
         ]);
     }
 }

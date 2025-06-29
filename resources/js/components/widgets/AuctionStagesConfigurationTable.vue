@@ -1,34 +1,50 @@
 <script setup lang="ts">
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { defineEmits, defineProps, ref } from 'vue';
-const props = defineProps<{
+import { defineEmits, defineProps, ref, computed } from 'vue';
+const props = defineProps({
     stages: {
-        lazy_stage: {
-            start_time: string;
-            end_time: string;
-            status: string;
-        };
-        aggressive_stage: {
-            start_time: string;
-            end_time: string;
-            stage: string;
-        };
-        sniping_stage: {
-            start_time: string;
-            end_time: string;
-            stage: string;
-        };
-    };
-    isAuctionConfigurable?: boolean;
-}>();
-
+        type: Object,
+        required: true,
+        default: () => ({
+            lazy_stage: {
+                start_time: '',
+                end_time: '',
+                status: ''
+            },
+            aggressive_stage: {
+                start_time: '',
+                end_time: '',
+                stage: ''
+            },
+                sniping_stage: {
+                start_time: '',
+                end_time: '',
+                stage: ''
+            }
+        }),
+        validator: (value) => {
+            return [
+                'lazy_stage',
+                'aggressive_stage',
+                'sniping_stage'
+            ].every(stage => value[stage]);
+        }
+    },
+    isAuctionConfigurable: {
+        type: Boolean,
+        required: true,
+        default: false
+    }
+});
 const emit = defineEmits<{
     (e: 'update:time', payload: { stageName: string; field: 'start_time' | 'end_time'; value: string }): void;
     (e: 'save:time', payload: null): void;
 }>();
 
-const isAuctionConfigurable = true;
+// let isAuctionConfigurable = computed(() => {
+
+// });
 const changeMade = ref(false);
 
 function increaseTimeByOneSecond(timeString: string) {

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Bid;
 use App\Models\PhillipsAccount;
 use App\Models\AuctionSession;
+use App\Models\Vehicle;
 use Illuminate\Http\Request;
 
 class BidController extends Controller
@@ -30,7 +31,6 @@ class BidController extends Controller
         $bid->bid_stage_id = 1;
         $bid->save();
 
-
         return response()->json($bid);
     }
 
@@ -39,10 +39,12 @@ class BidController extends Controller
         $decodedTitle = urldecode($request->id);
         $normalizedTitle = trim(preg_replace('/\s+/', ' ', $decodedTitle));
 
-        \Log::info($normalizedTitle);
-        $auction = AuctionSession::query()->where('title', $normalizedTitle)->first();
+        $words = explode(' ', $normalizedTitle);
+        $firstThreeWords = implode(' ', array_slice($words, 0, 3));
 
-        \Log::info($auction);
+        $auction = AuctionSession::query()->where('title', 'LIKE', $firstThreeWords . '%')->first();
+
+        // \Log::info($auction);
         $vehicles = $auction->vehicles;
 
         $vehicle_ids = [];

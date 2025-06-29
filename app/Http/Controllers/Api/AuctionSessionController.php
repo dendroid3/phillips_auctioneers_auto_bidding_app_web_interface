@@ -3,17 +3,22 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Jobs\ScrapeVehicles;
 use App\Models\AuctionSession;
 use App\Models\BidStage;
 use App\Models\PhillipsAccount;
+use App\Models\Vehicle;
 use Illuminate\Http\Request;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use App\Http\Resources\VehicleResource;
-use App\Http\Resources\AuctionSessionResource;
-
+use Illuminate\Support\Str;
 use App\Jobs\PlaceBid;
+use App\Jobs\TestPhillipsAccountCredentials;
+use App\Jobs\MonitorEmail;
+use App\Jobs\ScrapeAuctions;
 
+use App\Events\NotificationFromInitAuctionTestEvent;
 class AuctionSessionController extends Controller
 {
 
@@ -22,7 +27,10 @@ class AuctionSessionController extends Controller
         $decodedTitle = urldecode($request->id);
         $normalizedTitle = trim(preg_replace('/\s+/', ' ', $decodedTitle));
 
-        $auction = AuctionSession::query()->where('title', $normalizedTitle)->first();
+        $words = explode(' ', $normalizedTitle);
+        $firstThreeWords = implode(' ', array_slice($words, 0, 3));
+
+        $auction = AuctionSession::query()->where('title', 'LIKE', $firstThreeWords . '%')->first();
         $bidStages = $auction->bidStages;
 
         if (!$auction) {
@@ -119,43 +127,14 @@ class AuctionSessionController extends Controller
 
     public function scrapeVehicles($vehicles_url, $auction_id)
     {
-        // try {
-        //     $process = new Process([
-        //         '/usr/bin/node',
-        //         '/home/wanjohi/Code/web/phillips/puppeteer/scrapeVehicles.js',
-        //         '--url',
-        //         $vehicles_url,
-        //         '--auction_id',
-        //         $auction_id
-        //     ]);
 
-        //     $process->run();
-
-        //     if (!$process->isSuccessful()) {
-        //         throw new ProcessFailedException($process);
-        //     }
-
-        //     $output = $process->getOutput();
-        //     \Log::info("Script output: " . $output);
-
-        //     return $output;
-
-        // } catch (\Exception $e) {
-        //     \Log::error("Error running script: " . $e->getMessage());
-        //     return false;
-        // }
-
-        $command = '--url ' .
-            $vehicles_url .
-            '--auction_id ' .
-            $auction_id;
-
-        \Log::info($command);
+        // \Log::info("we should be scrapping vehicles now..");
+        ScrapeVehicles::dispatch($vehicles_url, $auction_id);
     }
 
     public function updateBidStages(Request $request)
     {
-        \Log::info($request->all());
+        // \Log::info($request->all());
 
         $stages = $request->all();
 
@@ -186,23 +165,41 @@ class AuctionSessionController extends Controller
 
     public function initialize(Request $request)
     {
-        \Log::info("Called");
-        foreach ($request -> email as $key => $value) {
-            # code...
+        $phillips_accounts = PhillipsAccount::query()->get();
+
+        foreach ($phillips_accounts as $phillips_account) {
+            $phillips_account->status = 'dormant';
+            $phillips_account->email_status = 'dormant';
+            $phillips_account->account_status = 'dormant';
+            $phillips_account->status = 'dormant';
+            $phillips_account->push();
         }
-        // Call script
-        $email = $request->all()[0]['email'];
-        $password = $request->all()[0]['password'];
 
-        $cmd = "node " . '/home/wanjohi/Code/web/phillips/puppeteer/initAuctionSession.js' .
-            " --email=" . escapeshellarg($email) .
-            " --password=" . escapeshellarg($password) .
-            " 2>&1";
-        // " > /dev/null 2>&1 &";
+        foreach ($request->all()['accounts'] as $account) {
+            if ($account['email'] && $account['email_password'] && $account['phillips_account_password']) {
+                $phillips_account = PhillipsAccount::query()->where('email', $account['email'])->first();
+                $phillips_account->account_status = "testing";
+                $phillips_accounts->status = "testing";
+                $phillips_account->email_app_password = $account['email_password'];
+                $phillips_account->account_password = $account['phillips_account_password'];
+                $phillips_account->push();
 
-        exec($cmd, $output, $returnCode);
-        \Log::info("Output: " . print_r($output, true));
-        \Log::info("Return Code: " . $returnCode);
+                $auction_session = AuctionSession::query()->where('id', $request->all()['auction_id'])->first();
+                $auction_session->status = "testing";
+                $auction_session->push();
+
+                TestPhillipsAccountCredentials::dispatch(
+                    phillips_account_email: $account['email'],
+                    phillips_account_password: $account['phillips_account_password']
+                );
+
+                MonitorEmail::dispatch(
+                    email: $account['email'],
+                    email_password: $account['email_password']
+                )->onQueue('email');
+                ;
+            }
+        }
 
         return response()->json([
             "id" => ceil(rand(1, 10) * 32874),
@@ -229,7 +226,59 @@ class AuctionSessionController extends Controller
          * If 403 || 404 change phillip account status to rejected
          * ------- Front end to alert this so as to suspend all other activity till it is read
          */
-        \Log::info($request->all());
+        // type, id, title, description
+        // \Log::info("processInitTestResult Called");
+        if ($request->status == 200) {
+            $id = Str::random(10) . "-" . $request->email;
+            $type = "success";
+            $title = "Account Credentials Confirmed";
+            $description = "The credentials for phillips account " . $request->email . " tested successfully";
+
+            $phillips_account = PhillipsAccount::query()->where('email', $request->email)->first();
+            $phillips_account->account_status = "active";
+            $phillips_account->email_status = "active";
+            $phillips_account->status = "active";
+            $phillips_account->push();
+
+            $phillips_account_on_test = PhillipsAccount::query()
+            ->where('account_status', 'testing')
+            ->orWhere('account_status', 'failed')
+            ->get();
+
+            if (count($phillips_account_on_test) == 0) {
+                $auction_session = AuctionSession::query()->where('status', 'testing')->first();
+                $auction_session->status = "unconfigured";
+                $auction_session->push();
+            }
+
+            $phillips_account_failed=PhillipsAccount::query()
+            ->where('account_status', 'failed')
+            ->get();
+
+            if(count($phillips_account_failed) > 0){
+                $auction_session = AuctionSession::query()->where('status', 'testing')->first();
+                $auction_session->status = "unconfigurable";
+                $auction_session->push();
+            }
+
+            event(new NotificationFromInitAuctionTestEvent($id, $type, $title, $description));
+        } else {
+            $id = Str::random(10) . "-" . $request->email;
+            $type = "fail";
+            $title = "Account Credentials Failed";
+            $description = "The credentials for phillips account " . $request->email . " failed. Kindly restart the initialization process and ensure the credentials are correct";
+
+
+            $phillips_account = PhillipsAccount::query()->where('email', $request->email)->first();
+            $phillips_account->account_status = "failed";
+            $phillips_account->push();
+
+            \Log::info('failed');
+            // \Log::info($id, $type, $title, $description;
+            event(new NotificationFromInitAuctionTestEvent($id, $type, $title, $description));
+        }
+
+        // \Log::info($request->all());
     }
     public function processNewEmail(Request $request)
     {
@@ -245,18 +294,47 @@ class AuctionSessionController extends Controller
          * 
          * 
          */
-        PlaceBid::dispatch(
-            url: $request->url,
-            amount: 35000,
-            maximum_amount: 40000,
-            increment: 2500,
-            email: 'Denis@.com',
-            password: "ernestotieno95@gmail.com",
-            vehicle_id: 1,
-            vehicle_name: "KCC-123P-TOYOTA-DEMIO",
-            bid_stage: "lazy stage"
-        );
+        // \Log::info($request->all());
+        // \Log::info("placebid");
+        // if($request->current_bid == )
+        if (ceil(rand(1, 10)) > 5) {
+            $vehicle = Vehicle::query()->where('url', 'https://phillipsauctioneers.co.ke/product/kcx-867j-toyota-prado-2/')->first();
+        } else {
+            $vehicle = Vehicle::query()->where('url', 'https://phillipsauctioneers.co.ke/product/ktcc-364g-case-tractor-2/')->first();
+        }
 
-        \Log::info($request->all());
+        $auction = $vehicle->AuctionSession;
+        $lastBidAmount = $vehicle->bids()->latest()->value('amount');
+
+        // Randomize account selection;
+
+        $active_account = PhillipsAccount::query()->where('status', 'active')
+            ->inRandomOrder()
+            ->first();
+        // \Log::info("Last bid amount: " . $lastBidAmount);
+        PlaceBid::dispatch(
+            url: "http://phillips.adilirealestate.com/bidSuccess.html",// $request->url,
+            amount: $request->current_bid + $vehicle->lazy_stage_increment,
+            maximum_amount: $vehicle->maximum_amount,
+            increment: $vehicle->lazy_stage_increment,
+            email: $active_account->email,
+            password: $active_account->account_password,
+            vehicle_id: $vehicle->id,
+            vehicle_name: $vehicle->phillips_vehicle_id,
+            bid_stage: "lazy stage"
+        )->onQueue('placeBids');
+
+        // \Log::info($request->all());
+    }
+
+    public function scrape(Request $request)
+    {
+        // \Log::info("scrapiing");
+
+        ScrapeAuctions::Dispatch();
+
+        return response()->json([
+            "message" => "Scrape initiated, please reload the page after 2-3 minutes."
+        ]);
     }
 }

@@ -20,7 +20,7 @@ class AuctionSession extends Model
 
     public function vehicles ()
     {
-        return $this->hasMany(Vehicle::class);
+        return $this->hasMany(Vehicle::class)->orderBy('updated_at', 'desc');
     }
 
     public function bidStages ()

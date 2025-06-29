@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AuctionSessionController;
 use App\Http\Controllers\Api\BidController;
+use App\Http\Controllers\Api\EmailController;
 use App\Http\Controllers\Api\SnipingController;
 use App\Http\Controllers\Api\VehicleController;
 use App\Http\Controllers\Api\MonitoringController;
@@ -40,6 +41,16 @@ Route::group(["prefix" => "auction"], function () {
         "processInitTestResults"
     ]);
 
+    Route::post("scrape", [
+        AuctionSessionController::class,
+        "scrape"
+    ]);
+
+    Route::post("scrapevehicles", [
+        AuctionSessionController::class,
+        "scrapeVehicles"
+    ]);
+
     Route::group(['prefix' => 'bid_stages'], function () {
         Route::post('update', [
             AuctionSessionController::class,
@@ -63,6 +74,10 @@ Route::group(["prefix" => "vehicle"], function () {
         VehicleController::class,
         "storeUrls"
     ])->name("vehicle.storeUrl");
+    Route::post("drop", [
+        VehicleController::class,
+        "dropOff"
+    ]);
 });
 
 Route::group(['prefix' => 'sniping'], function () {
@@ -88,5 +103,13 @@ Route::group(['prefix' => 'email'], function () {
     Route::post('start', [MonitoringController::class, 'start']);
     Route::post('stop/{email}', [MonitoringController::class, 'stop']);
     Route::get('status', [MonitoringController::class, 'status']);
+    Route::post('/init', [
+        EmailController::class,
+        "processInitResponse"
+    ]);
+    Route::post('/heartbeat', [
+        EmailController::class,
+        "processHeartbeat"
+    ]);
 });
 

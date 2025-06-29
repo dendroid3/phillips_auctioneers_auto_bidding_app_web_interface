@@ -44,9 +44,9 @@ const handleVehicleUpdateInDB = () => {
                     <TableHead v-if="!isAuctionConfigurable">Total Bids</TableHead>
                     <TableHead>{{ isAuctionConfigurable ? 'Current Bid' : 'Final Bid'}}</TableHead>
                     <TableHead>Status</TableHead>
-                    <TableHead>Lazy Stage</TableHead>
-                    <TableHead>Aggressive Stage</TableHead>
-                    <TableHead>Sniping Stage</TableHead>
+                    <TableHead>Lazy Stage Increment</TableHead>
+                    <TableHead>Aggressive Stage Increment</TableHead>
+                    <TableHead>Sniping Stage Increment</TableHead>
                     <TableHead v-if="isAuctionConfigurable">Actions</TableHead>
                 </TableRow>
             </TableHeader>

@@ -16,6 +16,10 @@ return new class extends Migration
             $table->unsignedBigInteger('user_id')->index();
             $table->string('email');
             $table->string('account_password')->nullable();
+            $table->string('account_status')->default('dormant');
+            $table->string('email_app_password')->nullable();
+            $table->string('email_status')->default('dormant');
+            $table->time('last_email_update')->nullable();
             $table->string('status')->default('dormant');
             $table->timestamps();
         });

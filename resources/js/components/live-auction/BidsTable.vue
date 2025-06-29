@@ -1,13 +1,20 @@
 <script setup lang="ts">
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import axios from 'axios';
 import { useMoney } from '@/lib/utils';
-import { onMounted, ref } from 'vue';
-const { formatKES } = useMoney();
+import axios from 'axios';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
+import { onMounted, ref, computed, onUnmounted } from 'vue';
+const { formatKES } = useMoney();
 
 dayjs.extend(relativeTime);
+const getRelativeTime = (time) => {
+  const date = dayjs(time);
+  return date.isValid() ? date.fromNow() : 'Invalid date';
+};
+
+// Auto-refresh logic
+let refreshInterval: number;
 const bidRelativeTime = (time) => {
     const date = dayjs(time);
 
@@ -43,9 +50,12 @@ const fetchAuctionBids = async () => {
 onMounted(() => {
     setTimeout(() => {
         fetchAuctionBids();
+        refreshInterval = setInterval(fetchAuctionBids, 30_000);
     }, 0);
 });
-const capitalize = str => str ? `${str[0].toUpperCase()}${str.slice(1)}` : '';
+
+onUnmounted(() => clearInterval(refreshInterval));
+const capitalize = (str) => (str ? `${str[0].toUpperCase()}${str.slice(1)}` : '');
 </script>
 <template>
     <div class="border-sidebar-border/70 dark:border-sidebar-border mt-4 flex-1 rounded-xl border">
@@ -62,12 +72,20 @@ const capitalize = str => str ? `${str[0].toUpperCase()}${str.slice(1)}` : '';
                 </TableRow>
             </TableHeader>
 
-            <TableBody>
-                <TableRow v-for="(bid, index) in bids" :key="index">
-                    <TableCell class="border-l-4 border-green-500">{{ bid.vehicle.phillips_vehicle_id }}</TableCell>
+            <TableBody v-if="bids">
+                <TableRow
+                    v-for="(bid, index) in bids"
+                    :key="index"
+                    :class="bid.status == 'highest' || bid.status == 'Highest' ? 'text-green-500' : 'text-red-500'"
+                >
+                    <TableCell
+                        class="border-l-4 border-green-500"
+                        :class="bid.status == 'highest' || bid.status == 'Highest' ? 'border-green-500' : 'border-red-500'"
+                        >{{ bid?.vehicle?.phillips_vehicle_id }}</TableCell
+                    >
                     <TableCell>{{ bidRelativeTime(bid.created_at) }}</TableCell>
-                    <TableCell>{{ bid.phillips_account.email }}</TableCell>
-                    <TableCell>{{ capitalize(bid.bid_stage.name) }}</TableCell>
+                    <TableCell>{{ bid?.phillips_account?.email }}</TableCell>
+                    <TableCell>{{ capitalize(bid?.bid_stage?.name) }}</TableCell>
                     <TableCell>{{ capitalize(bid.status) }}</TableCell>
                     <TableCell>{{ formatKES(bid.amount) }}</TableCell>
                 </TableRow>

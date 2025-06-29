@@ -66,6 +66,13 @@ const handleTimeUpdate = ({ stageName, field, value }) => {
 };
 
 onMounted(() => {
+    const events = ['.bid.created', '.account.testresults'];
+
+    events.forEach((event) => {
+        window.Echo.channel('public-channel').listen(event, (e) => {
+            fetchAuctionDetails();
+        });
+    });
     setTimeout(() => {
         fetchAuctionDetails();
     }, 0);
@@ -112,6 +119,9 @@ function isToday(dateString) {
         <h2 class="text-3rem p-4 text-2xl font-bold tracking-tight sm:text-3xl">
             {{ auction.title }}
         </h2>
+        <h3 class="text2rem p-4 text-xl tracking-tight">
+            {{ auction.status }}
+        </h3>
         <div class="flex w-full justify-center p-4">
             <Progress
                 disabled
@@ -125,17 +135,11 @@ function isToday(dateString) {
             />
         </div>
         <div class="flex w-full justify-center p-4" v-if="isToday(auction.date)">
-            <Button :variant="`destructive`" class="mx-4 cursor-pointer">
-                <svg width="24" height="24" viewBox="0 0 24 24">
-                    <!-- Finger curve -->
-                    <path d="M10 18C10 18 8 16 8 14V10" stroke="currentColor" stroke-width="2" fill="none" />
-                    <!-- Trigger -->
-                    <path d="M8 10H12V14H8" fill="currentColor" class="transition-transform hover:translate-x-1" />
-                </svg>
-                Bomb!
-            </Button>
+            <Button :variant="`destructive`" class="mx-4 cursor-pointer"> Bomb! </Button>
             <InitiatizationPopover
                 :phillips_accounts_emails="auction.phillips_accounts_emails"
+                :auction_id="auction.id"
+                :auction_status="auction.status"
                 @initialization:started="handleInitilizationStarted"
             />
         </div>
@@ -143,12 +147,13 @@ function isToday(dateString) {
         <div class="flex w-full justify-center p-4" v-if="isToday(auction.date)">
             <AuctionStagesConfigurationTable
                 :stages="transformStages(stages)"
-                :isAuctionConfigurable="true"
+                :isAuctionConfigurable="auction.status == 'unconfigured'"
                 v-if="auctionSessionFetched"
                 @update:time="handleTimeUpdate"
                 @save:time="handleSaveTime"
             />
         </div>
+
         <div class="relative">
             <VehiclesTable
                 :vehicles="auction.vehicles"

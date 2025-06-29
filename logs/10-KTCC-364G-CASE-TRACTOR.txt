@@ -1,0 +1,78 @@
+------------------------------------------------------
+LOGS FOR VEHICLE 10 KTCC-364G-CASE-TRACTOR
+------------------------------------------------------
+
+------------------------------------------------------
+19:36:04: We've began bidding, first sprint:
+Stage: lazy stage
+Account: ernestotieno95@gmail.com
+Increment: 1002
+------------------------------------------------------
+19:36:05, INFO: Navigating to login page
+19:36:43, ERROR: Navigating frame was detached
+19:36:43, SUCCESS: Sprint Complete
+19:36:43, ERROR: Fatal error: TargetCloseError: Protocol error (Page.captureScreenshot): Session closed. Most likely the page has been closed.
+
+
+------------------------------------------------------
+19:36:44: We've been outbid, another sprint:
+Stage: lazy stage
+Account: ernestotieno95@gmail.com
+Increment: 1002
+------------------------------------------------------
+19:36:45, INFO: Navigating to login page
+19:37:01, INFO: Entering credentials
+19:37:01, INFO: Submitting login form
+19:37:06, ERROR: Navigating frame was detached
+19:37:06, SUCCESS: Sprint Complete
+19:37:06, ERROR: Fatal error: TargetCloseError: Protocol error (Page.captureScreenshot): Session closed. Most likely the page has been closed.
+
+
+------------------------------------------------------
+19:37:07: We've been outbid, another sprint:
+Stage: lazy stage
+Account: ernestotieno95@gmail.com
+Increment: 1002
+------------------------------------------------------
+19:37:07, INFO: Navigating to login page
+19:37:10, ERROR: Navigating frame was detached
+19:37:10, SUCCESS: Sprint Complete
+19:37:10, ERROR: Fatal error: TargetCloseError: Protocol error (Page.captureScreenshot): Session closed. Most likely the page has been closed.
+
+
+------------------------------------------------------
+19:52:29: We've been outbid, another sprint:
+Stage: lazy stage
+Account: ernestotieno95@gmail.com
+Increment: 1002
+------------------------------------------------------
+19:52:31, INFO: Navigating to login page
+19:53:07, INFO: Entering credentials
+19:53:08, INFO: Submitting login form
+19:53:11, SUCCESS: Logged in successfully
+
+
+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+19:53:11, INFO: Navigating to auction page
+19:53:25, INFO: Placing bid of 120000
+19:53:25, INFO: Waiting for bid confirmation popup
+19:53:35, ERROR: ℹ️ No confirmation message detected within timeout period, trying to place bid again.
+19:53:35, INFO: New bid will be placed in ~12 seconds
+
+
+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+19:53:37, INFO: We are chasing the highest
+19:53:37, INFO: Placing bid of 120000
+19:53:38, INFO: Waiting for bid confirmation popup
+19:53:38, ERROR: There is a higher current bid
+19:53:38, ERROR: Outbidded
+19:53:38, INFO: New bid will be placed in ~19 seconds
+
+
+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+19:53:57, INFO: We are chasing the highest
+19:53:58, INFO: Placing bid of 121002
+19:53:58, INFO: Waiting for bid confirmation popup
+19:53:58, SUCCESS: We are the highest bidder.
+19:53:58, SUCCESS: Highest
+19:53:58, SUCCESS: Sprint Complete

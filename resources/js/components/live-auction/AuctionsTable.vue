@@ -5,7 +5,6 @@ import { Loader2 } from 'lucide-vue-next';
 import { onMounted, ref } from 'vue';
 import { Button } from '../ui/button';
 import AuctionRow from './AuctionRow.vue';
-
 const auctions = ref<any[]>([]);
 const isLoading = ref(true);
 
@@ -13,6 +12,12 @@ const goToAuction = (title: string) => {
     const formattedTitle = title.replace(',', '').replace(/\s/g, '-');
     location.replace(`/auction/${formattedTitle}`);
 };
+
+const forceScrape = async () => {
+    const response = await axios.post('/api/auction/scrape');
+
+    alert(response.data.message);
+}
 
 onMounted(async () => {
     try {
@@ -32,7 +37,7 @@ onMounted(async () => {
     <div v-if="isLoading">Loading...</div>
     <div v-else>
         <div class="mb-4 flex justify-center">
-            <Button class="cursor-pointer bg-green-500 text-white">
+            <Button class="cursor-pointer bg-green-500 text-white" @click="forceScrape">
                 Force Scrape Auctions
                 <!-- <Loader2 className="mr-2 h-4 w-4 animate-spin" /> -->
             </Button>

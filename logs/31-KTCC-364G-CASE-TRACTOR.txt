@@ -1,0 +1,323 @@
+------------------------------------------------------
+LOGS FOR VEHICLE 31 KTCC-364G-CASE-TRACTOR
+------------------------------------------------------
+
+------------------------------------------------------
+05:00:30: We've began bidding, first sprint:
+Stage: lazy stage
+Account: ernestotieno95@gmail.com
+Increment: 201
+------------------------------------------------------
+05:00:31, INFO: Navigating to login page
+05:00:39, INFO: Entering credentials
+05:00:40, INFO: Submitting login form
+05:00:46, SUCCESS: Logged in successfully
+
+
+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+05:00:46, INFO: Navigating to auction page
+05:00:52, INFO: Placing bid of 43241
+05:00:53, INFO: Waiting for bid confirmation popup
+05:00:53, SUCCESS: We are the highest bidder.
+05:00:53, SUCCESS: Highest
+05:00:53, SUCCESS: Sprint Complete
+
+
+------------------------------------------------------
+06:34:58: We've been outbid, another sprint:
+Stage: lazy stage
+Account: ernestotieno95@gmail.com
+Increment: 201
+------------------------------------------------------
+06:35:01, INFO: Navigating to login page
+
+
+------------------------------------------------------
+06:38:23: We've been outbid, another sprint:
+Stage: lazy stage
+Account: ernestotieno95@gmail.com
+Increment: 201
+------------------------------------------------------
+06:38:24, INFO: Navigating to login page
+06:38:44, INFO: Entering credentials
+06:38:45, INFO: Submitting login form
+06:38:49, SUCCESS: Logged in successfully
+
+
+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+06:38:49, INFO: Navigating to auction page
+06:38:51, INFO: Placing bid of 133241
+06:38:52, INFO: Waiting for bid confirmation popup
+06:38:52, SUCCESS: We are the highest bidder.
+06:38:52, SUCCESS: Highest
+06:38:52, SUCCESS: Sprint Complete
+
+
+------------------------------------------------------
+06:47:08: We've been outbid, another sprint:
+Stage: lazy stage
+Account: ernestotieno95@gmail.com
+Increment: 201
+------------------------------------------------------
+06:47:10, INFO: Navigating to login page
+06:47:32, INFO: Entering credentials
+06:47:32, INFO: Submitting login form
+06:47:36, SUCCESS: Logged in successfully
+
+
+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+06:47:36, INFO: Navigating to auction page
+06:47:40, INFO: Placing bid of 164091
+06:47:41, INFO: Waiting for bid confirmation popup
+06:47:41, ERROR: There is a higher current bid
+06:47:41, ERROR: Outbidded
+06:47:41, INFO: New bid will be placed in ~14 seconds
+
+
+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+06:47:55, INFO: We are chasing the highest
+06:47:56, INFO: Placing bid of 164292
+06:47:56, INFO: Waiting for bid confirmation popup
+06:47:56, SUCCESS: We are the highest bidder.
+06:47:56, SUCCESS: Highest
+06:47:56, SUCCESS: Sprint Complete
+
+
+------------------------------------------------------
+06:59:07: We've been outbid, another sprint:
+Stage: lazy stage
+Account: ernestotieno95@gmail.com
+Increment: 201
+------------------------------------------------------
+06:59:08, INFO: Navigating to login page
+06:59:20, INFO: Entering credentials
+06:59:21, INFO: Submitting login form
+06:59:28, SUCCESS: Logged in successfully
+
+
+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+06:59:28, INFO: Navigating to auction page
+06:59:32, INFO: Placing bid of 71201
+06:59:32, INFO: Waiting for bid confirmation popup
+06:59:32, ERROR: There is a higher current bid
+06:59:32, ERROR: Outbidded
+06:59:32, INFO: New bid will be placed in ~13 seconds
+
+
+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+06:59:45, INFO: We are chasing the highest
+06:59:45, INFO: Placing bid of 71402
+06:59:46, INFO: Waiting for bid confirmation popup
+06:59:46, ERROR: There is a higher current bid
+06:59:46, ERROR: Outbidded
+06:59:46, INFO: New bid will be placed in ~11 seconds
+
+
+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+06:59:57, INFO: We are chasing the highest
+06:59:57, INFO: Placing bid of 71603
+06:59:57, INFO: Waiting for bid confirmation popup
+06:59:57, ERROR: There is a higher current bid
+06:59:57, ERROR: Outbidded
+06:59:57, INFO: New bid will be placed in ~18 seconds
+
+
+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+07:00:16, INFO: We are chasing the highest
+07:00:16, INFO: Placing bid of 71804
+07:00:16, INFO: Waiting for bid confirmation popup
+07:00:17, ERROR: Error checking bid status: Protocol error (DOM.describeNode): Cannot find context with specified id
+07:00:17, ERROR: Protocol error (DOM.describeNode): Cannot find context with specified id
+07:00:17, SUCCESS: Sprint Complete
+
+
+------------------------------------------------------
+07:00:19: We've been outbid, another sprint:
+Stage: lazy stage
+Account: ernestotieno95@gmail.com
+Increment: 201
+------------------------------------------------------
+07:00:20, INFO: Navigating to login page
+07:00:31, INFO: Entering credentials
+07:00:31, INFO: Submitting login form
+07:00:41, SUCCESS: Logged in successfully
+
+
+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+07:00:41, INFO: Navigating to auction page
+07:00:44, INFO: Placing bid of 71201
+07:00:44, INFO: Waiting for bid confirmation popup
+07:00:44, SUCCESS: We are the highest bidder.
+07:00:45, SUCCESS: Highest
+07:00:45, SUCCESS: Sprint Complete
+
+
+------------------------------------------------------
+07:16:44: We've been outbid, another sprint:
+Stage: lazy stage
+Account: kazibin66@gmail.com
+Increment: 201
+------------------------------------------------------
+07:16:45, INFO: Navigating to login page
+07:16:58, INFO: Entering credentials
+07:16:58, INFO: Submitting login form
+07:17:03, SUCCESS: Logged in successfully
+
+
+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+07:17:03, INFO: Navigating to auction page
+07:17:06, INFO: Placing bid of 163241
+07:17:06, INFO: Waiting for bid confirmation popup
+07:17:06, ERROR: There is a higher current bid
+07:17:07, ERROR: Error checking bid status: Request failed with status code 500
+07:17:07, ERROR: Request failed with status code 500
+07:17:07, SUCCESS: Sprint Complete
+
+
+------------------------------------------------------
+07:17:08: We've been outbid, another sprint:
+Stage: lazy stage
+Account: kazibin66@gmail.com
+Increment: 201
+------------------------------------------------------
+07:17:10, INFO: Navigating to login page
+07:17:19, INFO: Entering credentials
+07:17:19, INFO: Submitting login form
+07:17:22, SUCCESS: Logged in successfully
+
+
+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+07:17:22, INFO: Navigating to auction page
+07:17:25, INFO: Placing bid of 163241
+07:17:25, INFO: Waiting for bid confirmation popup
+07:17:25, ERROR: There is a higher current bid
+07:17:25, ERROR: Error checking bid status: Request failed with status code 500
+07:17:25, ERROR: Request failed with status code 500
+07:17:26, SUCCESS: Sprint Complete
+
+
+------------------------------------------------------
+07:17:28: We've been outbid, another sprint:
+Stage: lazy stage
+Account: kazibin66@gmail.com
+Increment: 201
+------------------------------------------------------
+07:17:29, INFO: Navigating to login page
+07:17:35, INFO: Entering credentials
+07:17:35, INFO: Submitting login form
+07:17:38, SUCCESS: Logged in successfully
+
+
+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+07:17:38, INFO: Navigating to auction page
+07:17:43, INFO: Placing bid of 163241
+07:17:43, INFO: Waiting for bid confirmation popup
+07:17:44, SUCCESS: We are the highest bidder.
+07:17:44, ERROR: Error checking bid status: Request failed with status code 500
+07:17:44, ERROR: Request failed with status code 500
+07:17:44, SUCCESS: Sprint Complete
+
+
+------------------------------------------------------
+07:50:42: We've been outbid, another sprint:
+Stage: lazy stage
+Account: ernestotieno95@gmail.com
+Increment: 201
+------------------------------------------------------
+07:50:43, INFO: Navigating to login page
+07:51:04, INFO: Entering credentials
+07:51:04, INFO: Submitting login form
+07:51:10, SUCCESS: Logged in successfully
+
+
+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+07:51:10, INFO: Navigating to auction page
+07:51:15, INFO: Placing bid of 103241
+07:51:15, INFO: Waiting for bid confirmation popup
+07:51:15, ERROR: There is a higher current bid
+07:51:15, ERROR: Error checking bid status: Request failed with status code 500
+07:51:15, ERROR: Request failed with status code 500
+07:51:15, SUCCESS: Sprint Complete
+
+
+------------------------------------------------------
+07:51:17: We've been outbid, another sprint:
+Stage: lazy stage
+Account: ernestotieno95@gmail.com
+Increment: 201
+------------------------------------------------------
+07:51:18, INFO: Navigating to login page
+07:51:27, INFO: Entering credentials
+07:51:27, INFO: Submitting login form
+07:51:32, SUCCESS: Logged in successfully
+
+
+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+07:51:32, INFO: Navigating to auction page
+07:51:36, INFO: Placing bid of 103241
+07:51:36, INFO: Waiting for bid confirmation popup
+07:51:36, SUCCESS: We are the highest bidder.
+07:51:36, ERROR: Error checking bid status: Request failed with status code 500
+07:51:36, ERROR: Request failed with status code 500
+07:51:36, SUCCESS: Sprint Complete
+
+
+------------------------------------------------------
+07:51:38: We've been outbid, another sprint:
+Stage: lazy stage
+Account: ernestotieno95@gmail.com
+Increment: 201
+------------------------------------------------------
+07:51:40, INFO: Navigating to login page
+07:51:59, INFO: Entering credentials
+07:52:00, INFO: Submitting login form
+07:52:04, SUCCESS: Logged in successfully
+
+
+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+07:52:04, INFO: Navigating to auction page
+07:52:14, INFO: Placing bid of 103241
+07:52:14, INFO: Waiting for bid confirmation popup
+07:52:14, SUCCESS: We are the highest bidder.
+07:52:14, ERROR: Error checking bid status: Request failed with status code 500
+07:52:14, ERROR: Request failed with status code 500
+07:52:14, SUCCESS: Sprint Complete
+
+
+------------------------------------------------------
+08:36:03: We've been outbid, another sprint:
+Stage: lazy stage
+Account: kazibin66@gmail.com
+Increment: 500
+------------------------------------------------------
+08:36:04, INFO: Navigating to login page
+08:36:22, INFO: Entering credentials
+08:36:22, INFO: Submitting login form
+08:36:26, SUCCESS: Logged in successfully
+
+
+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+08:36:26, INFO: Navigating to auction page
+08:36:34, INFO: Placing bid of 133540
+08:36:35, INFO: Waiting for bid confirmation popup
+08:36:35, ERROR: There is a higher current bid
+08:36:35, ERROR: Outbidded
+08:36:35, INFO: New bid will be placed in ~15 seconds
+
+
+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+08:36:50, INFO: We are chasing the highest
+08:36:50, INFO: Placing bid of 134040
+08:36:50, INFO: Waiting for bid confirmation popup
+08:36:50, ERROR: There is a higher current bid
+08:36:51, ERROR: Outbidded
+08:36:51, INFO: New bid will be placed in ~12 seconds
+
+
+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+08:37:03, INFO: We are chasing the highest
+08:37:03, INFO: Placing bid of 134540
+08:37:03, INFO: Waiting for bid confirmation popup
+08:37:03, SUCCESS: We are the highest bidder.
+08:37:03, SUCCESS: Highest
+08:37:03, SUCCESS: Sprint Complete

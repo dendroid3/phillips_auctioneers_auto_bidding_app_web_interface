@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Button } from '@/components/ui/button';
-import { onMounted, ref, defineEmits } from 'vue';
+import { defineEmits, onMounted, ref } from 'vue';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
 
@@ -13,9 +13,19 @@ const props = defineProps({
         required: true,
         default: () => [],
     },
+    auction_id: {
+        type: Number,
+        required: true,
+        default: () => 1
+    },
+    auction_status: {
+        type: String,
+        required: true,
+        default: () => "unconfigured"
+    }
 });
 
-const emit = defineEmits(['intialization:started'])
+const emit = defineEmits(['intialization:started']);
 
 const emailsAndPasswords = ref([]);
 
@@ -23,7 +33,8 @@ onMounted(() => {
     // Get props and add to emailsAndPasswords
     emailsAndPasswords.value = props.phillips_accounts_emails.map((email) => ({
         email: email,
-        password: '',
+        email_password: '',
+        phillips_account_password: ''
     }));
 
     console.log(emailsAndPasswords.value);
@@ -31,31 +42,47 @@ onMounted(() => {
 
 const isOpen = ref();
 const initializeAuctionSession = async () => {
-    const response = await axios.post('/api/auction/initialize', emailsAndPasswords.value);
-    emit('initialization:started',  response.data)
+    const data = {
+        accounts: emailsAndPasswords.value,
+        auction_id: props.auction_id,
+    }
+    const response = await axios.post('/api/auction/initialize', data);
+    console.log(data)
+    emit('initialization:started', response.data);
     console.log(response.data);
-    isOpen.value = false
+    isOpen.value = false;
 };
-
-
 </script>
 
 <template>
     <Dialog v-model:open="isOpen">
         <DialogTrigger as-child>
-            <Button class="mx-4 cursor-pointer bg-green-500 text-white"> Initialize Bidding Session </Button>
-        </DialogTrigger>
-        <DialogContent class="sm:max-w-[425px]">
+            <Button class="mx-4 cursor-pointer bg-green-500 text-white" :disabled="auction_status != 'unconfigurable'"> Initialize Bidding Session {{ auction_status }}</Button>
+        </DialogTrigger>  
+        <DialogContent class="sm:max-w-[925px]">
             <DialogHeader>
-                <DialogTitle>Phillips Accounts Emails</DialogTitle>
+                <DialogTitle>Phillips Accounts Emails {{ auction_id }}</DialogTitle>
                 <DialogDescription> Enter Passwords for the phillips accounts you want used in this auction session </DialogDescription>
             </DialogHeader>
             <div class="grid gap-2">
-                <div class="flex grid grid-cols-10 items-center gap-4" v-for="(emailsAndPassword, index) in emailsAndPasswords" :key="index">
-                    <Label :for="`${index}-${emailsAndPassword}`" class="col-span-5">
+                <div class="flex grid grid-cols-11 items-center gap-4" v-for="(emailsAndPassword, index) in emailsAndPasswords" :key="index">
+                    <Label :for="`${index}-${emailsAndPassword}`" class="col-span-3">
                         {{ emailsAndPassword.email }}
                     </Label>
-                    <Input :id="`${index}-${emailsAndPassword}`" type="text" class="col-span-4 h-8" v-model="emailsAndPasswords[index].password" />
+                    <Input
+                        :id="`phillips_account_password_${index}`"
+                        type="text"
+                        class="col-span-4 h-8"
+                        v-model="emailsAndPasswords[index].phillips_account_password"
+                        placeholder="Account Password"
+                    />
+                    <Input
+                        :id="`email_password_${index}`"
+                        type="text"
+                        class="col-span-4 h-8"
+                        v-model="emailsAndPasswords[index].email_password"
+                        placeholder="Email Password"
+                    />
                 </div>
             </div>
             <DialogFooter>

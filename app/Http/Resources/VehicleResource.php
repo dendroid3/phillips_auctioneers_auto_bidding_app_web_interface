@@ -16,21 +16,7 @@ class VehicleResource extends JsonResource
             'sniping_stage' => null
         ];
 
-        // // Transform bid stages
-        // foreach ($this->bidStages as $stage) {
-        //     $key = strtolower($stage->name) . '_stage';
-        //     if (array_key_exists($key, $stages)) {
-        //         $stages[$key] = [
-        //             'id' => $stage->id,
-        //             'start_time' => $stage->start_time,
-        //             'end_time' => $stage->end_time,
-        //             'increment' => $stage->increment,
-        //             'status' => $stage->status
-        //         ];
-        //     }
-        // }
-
-        $bidStages = BidStage::query()->where('vehicle_id', 1)->get();
+        $bidStages = BidStage::query()->where('vehicle_id', $this->id)->get();
 
         foreach ($bidStages as $stage) {
             $key = strtolower($stage->name) . '_stage';

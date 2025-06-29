@@ -9,10 +9,13 @@ class PhillipsAccount extends Model
     protected $fillable = [
         "user_id",
         "email",
-        "password",
+        "account_password",
+        "account_status",
+        "email_app_password",
+        "email_status",
+        "last_email_update",
         "status"
     ];
-
     public function user ()  
     {
         return $this->belongsTo(User::class);

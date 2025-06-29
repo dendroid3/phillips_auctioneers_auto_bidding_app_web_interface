@@ -41,24 +41,29 @@ const removeAlert = (id: number) => {
 };
 
 onMounted(() => {
-    window.Echo.channel('public-channel').listen('.bid.created', (e) => {
-        if (e.type == 'success') {
-            playSuccess();
-        } else {
-            playFailure();
-        }
-        const newAlert = {
-            id: e.id,
-            type: e.type,
-            title: e.title,
-            description: e.description,
-        };
-        alerts.value.unshift(newAlert);
+    const events = ['.bid.created', '.account.testresults'];
 
-        // Auto-dismiss after 5-8 seconds
-        setTimeout(() => {
-            removeAlert(newAlert.id);
-        }, 90000);
+    events.forEach((event) => {
+        window.Echo.channel('public-channel').listen(event, (e) => {
+            console.log('Event caught');
+            if (e.type == 'success') {
+                playSuccess();
+            } else {
+                playFailure();
+            }
+            const newAlert = {
+                id: e.id,
+                type: e.type,
+                title: e.title,
+                description: e.description,
+            };
+            alerts.value.unshift(newAlert);
+
+            // Auto-dismiss after 5-8 seconds
+            setTimeout(() => {
+                removeAlert(newAlert.id);
+            }, 90000);
+        });
     });
 });
 

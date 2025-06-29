@@ -70,19 +70,21 @@ class PlaceBid implements ShouldQueue
         ];
 
         $process = new Process($command);
-        $process->setTimeout(300); // 5 minute timeout
+
+        $process->setTimeout(3600); // 1 hour timeout
+        $process->setIdleTimeout(300);
 
         try {
             $process->run();
 
-            \Log::info("Command Output: " . $process->getOutput());
+            // \Log::info("Command Output: " . $process->getOutput());
 
             if (!$process->isSuccessful()) {
                 throw new \RuntimeException($process->getErrorOutput());
             }
 
         } catch (\Exception $e) {
-            \Log::error("Command failed: " . $e->getMessage());
+            // \Log::error("Command failed: " . $e->getMessage());
             throw $e; // This will trigger the job's failed() method
         }
     }

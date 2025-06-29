@@ -10,16 +10,20 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class NotificationFromInitAuctionTestEvent
+class NotificationFromInitAuctionTestEvent implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    /**
-     * Create a new event instance.
-     */
-    public function __construct()
+    protected $id;
+    protected $type;
+    protected $title;
+    protected $description;
+    public function __construct($id, $type, $title, $description)
     {
-        //
+        $this->id = $id;
+        $this->type = $type;
+        $this->title = $title;
+        $this->description = $description;
     }
 
     /**
@@ -30,7 +34,21 @@ class NotificationFromInitAuctionTestEvent
     public function broadcastOn(): array
     {
         return [
-            new PrivateChannel('channel-name'),
+            new Channel('public-channel'),
         ];
+    }
+
+    public function BroadcastWith()
+    {
+        return [
+            "id" => $this->id,
+            "type" => $this->type,
+            "title" => $this->title,
+            "description" => $this->description
+        ];
+    }
+    public function broadcastAs(): string
+    {
+        return 'account.testresults';
     }
 }
