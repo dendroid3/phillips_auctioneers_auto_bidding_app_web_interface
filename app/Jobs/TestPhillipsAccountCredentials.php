@@ -24,7 +24,10 @@ class TestPhillipsAccountCredentials implements ShouldQueue
     public function handle(): void
     {
         $command = [
-            'node',
+            'sudo',
+    '-u',
+    'www-data',
+    'node',
             '/var/www/phillips/bot/initAuctionSession.js',
             '--email',
             $this->phillips_account_email,

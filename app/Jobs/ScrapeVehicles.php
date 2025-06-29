@@ -25,7 +25,10 @@ class ScrapeVehicles implements ShouldQueue
     public function handle(): void
     {
         $command = [
-            'node',
+            'sudo',
+    '-u',
+    'www-data',
+    'node',
             '/var/www/phillips/bot/scrapeVehicles.js',
             '--url',
             $this->url,

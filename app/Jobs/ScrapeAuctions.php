@@ -25,7 +25,10 @@ class ScrapeAuctions implements ShouldQueue
     public function handle(): void
     {
         $command = [
-            'node',
+            'sudo',
+    '-u',
+    'www-data',
+    'node',
             '/var/www/phillips/bot/scrapeAuctions.js',
         ];
         $process = new Process($command);
