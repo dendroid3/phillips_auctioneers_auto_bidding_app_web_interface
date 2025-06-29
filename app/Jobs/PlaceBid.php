@@ -47,9 +47,6 @@ class PlaceBid implements ShouldQueue
     public function handle(): void
     {
         $command = [
-            'sudo',
-            '-u',
-            'www-data',
             'node',
             '/var/www/phillips/bot/placeBid.js',
             '--url',
