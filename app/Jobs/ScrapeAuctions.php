@@ -34,6 +34,7 @@ class ScrapeAuctions implements ShouldQueue
         $process->setIdleTimeout(300);
 
         try {
+
             $process->run();
 
             // \Log::info("Command Output: " . $process->getOutput());
@@ -43,8 +44,9 @@ class ScrapeAuctions implements ShouldQueue
             }
 
         } catch (\Exception $e) {
-            // \Log::error("Command failed: " . $e->getMessage());
+            \Log::info("WTF");
             throw $e; // This will trigger the job's failed() method
+
         }
     }
 }
