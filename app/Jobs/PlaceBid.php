@@ -48,7 +48,7 @@ class PlaceBid implements ShouldQueue
     {
         $command = [
             'node',
-            '/home/wanjohi/Code/web/phillips/puppeteer/placeBid.js',
+            '/var/www/phillips/bot/placeBid.js',
             '--url',
             $this->url,
             '--amount',
