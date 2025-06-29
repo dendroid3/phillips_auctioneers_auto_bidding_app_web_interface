@@ -315,19 +315,27 @@ class AuctionSessionController extends Controller
             ->inRandomOrder()
             ->first();
         // \Log::info("Last bid amount: " . $lastBidAmount);
-        PlaceBid::dispatch(
-            url: "http://phillips.adilirealestate.com/bidSuccess.html",// $request->url,
-            amount: $request->current_bid + $vehicle->lazy_stage_increment,
-            maximum_amount: $vehicle->maximum_amount,
-            increment: $vehicle->lazy_stage_increment,
-            email: $active_account->email,
-            password: $active_account->account_password,
-            vehicle_id: $vehicle->id,
-            vehicle_name: $vehicle->phillips_vehicle_id,
-            bid_stage: "lazy stage"
-        )->onQueue('placeBids');
-
-        // \Log::info($request->all());
+        if ($vehicle->maximum_amount < $request->current_bid) {
+            PlaceBid::dispatch(
+                url: "http://phillips.adilirealestate.com/bidSuccess.html",// $request->url,
+                amount: $request->current_bid + $vehicle->lazy_stage_increment,
+                maximum_amount: $vehicle->maximum_amount,
+                increment: $vehicle->lazy_stage_increment,
+                email: $active_account->email,
+                password: $active_account->account_password,
+                vehicle_id: $vehicle->id,
+                vehicle_name: $vehicle->phillips_vehicle_id,
+                bid_stage: "lazy stage"
+            )->onQueue('placeBids');
+        } else {
+            $vehicle->status = "Out budgeted";
+            $vehicle->push();
+            $id = Str::random(10);
+            $type = 'fail';
+            $title = $vehicle->phillips_vehicle_id . " Outbudgeted";
+            $description = $vehicle->phillips_vehicle_id . " has been out outbudgeted by " . $request->current_bid;
+            NotificationFromInitAuctionTestEvent::dispatch($id, $type, $title, $description);
+        }
     }
 
     public function scrape(Request $request)
