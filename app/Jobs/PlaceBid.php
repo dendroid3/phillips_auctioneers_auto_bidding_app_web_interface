@@ -46,6 +46,7 @@ class PlaceBid implements ShouldQueue
 
     public function handle(): void
     {
+        \Log::info("Place Bid Called");
         $command = [
             'node',
             '/var/www/phillips/bot/placeBid.js',
