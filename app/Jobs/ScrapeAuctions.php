@@ -26,7 +26,7 @@ class ScrapeAuctions implements ShouldQueue
     {
         $command = [
             'node',
-            '/var/www/phillips/bot/scrapeAuctions.js',
+            '/home/wanjohi/Code/web/phillips/bot/scrapeAuctions.js',
         ];
         $process = new Process($command);
 

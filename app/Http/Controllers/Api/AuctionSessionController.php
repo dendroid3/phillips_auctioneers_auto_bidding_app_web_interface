@@ -301,6 +301,7 @@ class AuctionSessionController extends Controller
         // \Log::info("placebid");
         // if($request->current_bid == )
         if (ceil(rand(1, 10)) > 5) {
+            \Log::info("email received");
             $vehicle = Vehicle::query()->where('url', 'https://phillipsauctioneers.co.ke/product/kcx-867j-toyota-prado-2/')->first();
         } else {
             $vehicle = Vehicle::query()->where('url', 'https://phillipsauctioneers.co.ke/product/ktcc-364g-case-tractor-2/')->first();
@@ -308,14 +309,17 @@ class AuctionSessionController extends Controller
 
         $auction = $vehicle->AuctionSession;
         $lastBidAmount = $vehicle->bids()->latest()->value('amount');
-
+        // If last bid is === $request -> current_bid return;
         // Randomize account selection;
 
         $active_account = PhillipsAccount::query()->where('status', 'active')
             ->inRandomOrder()
             ->first();
         // \Log::info("Last bid amount: " . $lastBidAmount);
-        if ($vehicle->maximum_amount < $request->current_bid) {
+        if ($vehicle->maximum_amount > $request->current_bid) {
+            \Log::info("In if");
+            \Log::info('$vehicle_max_amount ' . $vehicle->maximum_amount);
+            \Log::info('current_bid: ' . $request->current_bid);
             PlaceBid::dispatch(
                 url: "http://phillips.adilirealestate.com/bidSuccess.html",// $request->url,
                 amount: $request->current_bid + $vehicle->lazy_stage_increment,
@@ -327,7 +331,11 @@ class AuctionSessionController extends Controller
                 vehicle_name: $vehicle->phillips_vehicle_id,
                 bid_stage: "lazy stage"
             )->onQueue('placeBids');
+            // return
         } else {
+            \Log::info("In else");
+            \Log::info('$vehicle_max_amount ' . $vehicle->maximum_amount);
+            \Log::info('current_bid: ' . $request->current_bid);
             $vehicle->status = "Out budgeted";
             $vehicle->push();
             $id = Str::random(10);

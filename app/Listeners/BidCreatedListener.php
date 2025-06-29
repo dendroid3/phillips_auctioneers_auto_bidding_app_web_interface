@@ -32,7 +32,6 @@ class BidCreatedListener
             $active_account = PhillipsAccount::query()->where('status', 'active')
                 ->inRandomOrder()
                 ->first();
-            // \Log::info("Last bid amount: " . $lastBidAmount);
             PlaceBid::dispatch(
                 url: "http://phillips.adilirealestate.com/bidSuccess.html",// $request->url,
                 amount: $vehicle -> current_bid + $vehicle->lazy_stage_increment,

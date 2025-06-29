@@ -25,7 +25,7 @@ class TestPhillipsAccountCredentials implements ShouldQueue
     {
         $command = [
             'node',
-            '/var/www/phillips/bot/initAuctionSession.js',
+            '/home/wanjohi/Code/web/phillips/bot/initAuctionSession.js',
             '--email',
             $this->phillips_account_email,
             '--password',
