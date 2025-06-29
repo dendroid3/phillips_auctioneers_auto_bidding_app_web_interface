@@ -241,9 +241,9 @@ class AuctionSessionController extends Controller
             $phillips_account->push();
 
             $phillips_account_on_test = PhillipsAccount::query()
-            ->where('account_status', 'testing')
-            ->orWhere('account_status', 'failed')
-            ->get();
+                ->where('account_status', 'testing')
+                ->orWhere('account_status', 'failed')
+                ->get();
 
             if (count($phillips_account_on_test) == 0) {
                 $auction_session = AuctionSession::query()->where('status', 'testing')->first();
@@ -251,11 +251,11 @@ class AuctionSessionController extends Controller
                 $auction_session->push();
             }
 
-            $phillips_account_failed=PhillipsAccount::query()
-            ->where('account_status', 'failed')
-            ->get();
+            $phillips_account_failed = PhillipsAccount::query()
+                ->where('account_status', 'failed')
+                ->get();
 
-            if(count($phillips_account_failed) > 0){
+            if (count($phillips_account_failed) > 0) {
                 $auction_session = AuctionSession::query()->where('status', 'testing')->first();
                 $auction_session->status = "unconfigurable";
                 $auction_session->push();
@@ -273,6 +273,9 @@ class AuctionSessionController extends Controller
             $phillips_account->account_status = "failed";
             $phillips_account->push();
 
+            $auction_session = AuctionSession::query()->where('status', 'testing')->first();
+            $auction_session->status = "unconfigured";
+            $auction_session->push();
             \Log::info('failed');
             // \Log::info($id, $type, $title, $description;
             event(new NotificationFromInitAuctionTestEvent($id, $type, $title, $description));
