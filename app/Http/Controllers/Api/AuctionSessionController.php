@@ -274,7 +274,7 @@ class AuctionSessionController extends Controller
             $phillips_account->push();
 
             $auction_session = AuctionSession::query()->where('status', 'testing')->first();
-            $auction_session->status = "unconfigured";
+            $auction_session->status = "unconfigurable";
             $auction_session->push();
             \Log::info('failed');
             // \Log::info($id, $type, $title, $description;
