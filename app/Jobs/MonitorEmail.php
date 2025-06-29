@@ -29,7 +29,7 @@ class MonitorEmail implements ShouldQueue
     {
         $command = [
             'python3',
-            '/home/wanjohi/Code/web/phillips/email/index.py',
+            '/var/www/phillips/email/index.py',
             $this->email,
             $this->email_password
         ];
