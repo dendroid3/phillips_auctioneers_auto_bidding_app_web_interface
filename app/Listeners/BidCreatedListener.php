@@ -6,6 +6,8 @@ use App\Models\Vehicle;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use App\Events\BidCreatedEvent;
+use App\Models\PhillipsAccount;
+use App\Jobs\PlaceBid;
 
 class BidCreatedListener
 {
@@ -25,7 +27,23 @@ class BidCreatedListener
         $vehicle = Vehicle::query()->where('id', $event->bid->vehicle_id)->first();
         $vehicle->current_bid = $event->bid->amount;
         $vehicle->push();
-        // \Log::info("Bid created not");
-        // \Log::info($event -> bid->status);
+
+        if ($event->bid->status == "Outbidded") {
+            $active_account = PhillipsAccount::query()->where('status', 'active')
+                ->inRandomOrder()
+                ->first();
+            // \Log::info("Last bid amount: " . $lastBidAmount);
+            PlaceBid::dispatch(
+                url: "http://phillips.adilirealestate.com/bidSuccess.html",// $request->url,
+                amount: $vehicle -> current_bid + $vehicle->lazy_stage_increment,
+                maximum_amount: $vehicle->maximum_amount,
+                increment: $vehicle->lazy_stage_increment,
+                email: $active_account->email,
+                password: $active_account->account_password,
+                vehicle_id: $vehicle->id,
+                vehicle_name: $vehicle->phillips_vehicle_id,
+                bid_stage: "lazy stage"
+            )->onQueue('placeBids');
+        }
     }
 }
