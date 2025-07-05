@@ -27,7 +27,7 @@ class TestPhillipsAccountCredentials implements ShouldQueue
     {
         $command = [
             'node',
-            '/home/wanjohi/Code/web/phillips/puppeteer/initAuctionSession.js',
+            env('BOT_BASE_PATH').'/initAuctionSession.js',
             '--email',
             $this->phillips_account_email,
             '--password',

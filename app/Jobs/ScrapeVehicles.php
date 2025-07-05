@@ -26,7 +26,7 @@ class ScrapeVehicles implements ShouldQueue
     {
         $command = [
             'node',
-            '/home/wanjohi/Code/web/phillips/puppeteer/scrapeVehicles.js',
+            env('BOT_BASE_PATH').'/scrapeVehicles.js',
             '--url',
             $this->url,
             '--auction_id',
