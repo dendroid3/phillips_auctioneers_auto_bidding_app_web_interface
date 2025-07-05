@@ -26,7 +26,7 @@ class ScrapeAuctions implements ShouldQueue
     {
         $command = [
             'node',
-            '/home/wanjohi/Code/web/phillips/bot/scrapeAuctions.js',
+            '/home/wanjohi/Code/web/phillips/puppeteer/scrapeAuctions.js',
         ];
         $process = new Process($command);
 
@@ -37,14 +37,12 @@ class ScrapeAuctions implements ShouldQueue
 
             $process->run();
 
-            // \Log::info("Command Output: " . $process->getOutput());
 
             if (!$process->isSuccessful()) {
                 throw new \RuntimeException($process->getErrorOutput());
             }
 
         } catch (\Exception $e) {
-            \Log::info("WTF");
             throw $e; // This will trigger the job's failed() method
 
         }

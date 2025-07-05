@@ -48,7 +48,7 @@ class User extends Authenticatable
     }
 
     protected $dispatchesEvents = [
-        'saved' => UserCreatedEvent::class,
+        'created' => UserCreatedEvent::class,
     ];
 
     public function PhillipsAccount() 

@@ -30,6 +30,6 @@ class Bid extends Model
         return $this -> belongsTo(PhillipsAccount::class);
     }
     protected $dispatchesEvents = [
-        'saved' => BidCreatedEvent::class
+        'created' => BidCreatedEvent::class
     ];
 }

@@ -22,7 +22,7 @@ Route::get('scrape_auctions', function () {
 })->name('auctions.scrape');
 
 Route::get('test', function () {
-    $output = shell_exec('/usr/bin/node /home/wanjohi/Code/web/phillips/bot/initAuctionSession.js -p Ernest#2019. -e ernestotieno95@gmail.com');
+    $output = shell_exec('/usr/bin/node /home/wanjohi/Code/web/phillips/puppeteer/initAuctionSession.js -p Ernest#2019. -e ernestotieno95@gmail.com');
     $result = json_decode(trim($output), true); 
     Log::info("Result:", $result); 
     return $result;

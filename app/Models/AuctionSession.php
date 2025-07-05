@@ -29,6 +29,6 @@ class AuctionSession extends Model
     }
 
      protected $dispatchesEvents = [
-        'saved' => AuctionSessionCreatedEvent::class,
+        'created' => AuctionSessionCreatedEvent::class,
     ];
 }

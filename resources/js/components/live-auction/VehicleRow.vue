@@ -9,6 +9,7 @@ const { formatKES } = useMoney();
 import { Button } from '@/components/ui/button';
 
 import { computed, defineEmits, defineProps, inject, ref } from 'vue';
+import BidsPopover from '../widgets/BidsPopover.vue';
 
 const props = defineProps({
     modelValue: {
@@ -64,16 +65,15 @@ const lastBidRelativeTime = computed(() => {
 });
 
 const dropOff = async (vehicle_id) => {
-    if(!confirm(`Are you sure you want to drop ${vehicle_id} off the auction? You can bring it back later.`)) return
+    if (!confirm(`Are you sure you want to drop ${vehicle_id} off the auction? You can bring it back later.`)) return;
 
-    const response = await axios.post("/api/vehicle/drop", {
-        id: vehicle_id
-    })
-    alert(response.data.message)
-    location.reload()
-}
+    const response = await axios.post('/api/vehicle/drop', {
+        id: vehicle_id,
+    });
+    emit('vehicle-saved');
+};
 
-const emit = defineEmits(['update:modelValue', 'update:vehicle-in-db']);
+const emit = defineEmits(['update:modelValue', 'update:vehicle-in-db', 'vehicle-saved']);
 
 const changeMade = ref(false);
 
@@ -121,7 +121,6 @@ const updateTime = (value, nestedPath) => {
         const timeSec = toSeconds(value);
         if (timeSec < toSeconds('11:15:00') || timeSec > toSeconds('12:30:00')) {
             isValid = false;
-            alert('Lazy stage must end between 11:15 AM and 12:30 PM');
             // Auto-correct to nearest valid time
             if (timeSec < toSeconds('11:15:00')) {
                 value = '11:15:00';
@@ -218,8 +217,7 @@ const saveChanges = async () => {
         const response = await axios.put(`/api/vehicle/update`, props.modelValue);
 
         changeMade.value = false;
-        alert(response.data.message);
-        location.reload()
+        emit('vehicle-saved');
 
         console.log('Save successful');
         isSaving = false;
@@ -289,10 +287,42 @@ const saveChanges = async () => {
         <TableCell v-if="!isAuctionConfigurable"> {{ modelValue.bids.length }} </TableCell>
         <TableCell class="cursor-pointer">
             <div class="flex">
-                {{ modelValue.current_bid < 1 || modelValue.bids.lenght < 1 ? 'None ' : formatKES(modelValue.current_bid) }}
+                <p
+                    :class="
+                        modelValue.current_bid_status == 'Highest' || modelValue.current_bid_status == 'highest'
+                            ? 'text-green-500'
+                            : modelValue.current_bid_status == 'Outbidded' || modelValue.current_bid_status == 'outbidded'
+                              ? 'text-amber-500'
+                              : 'text-red-500'
+                    "
+                >
+                    {{ modelValue.current_bid < 1 || modelValue.bids.length < 1 ? 'None ' : formatKES(modelValue.current_bid) }}
+                </p>
+                <p
+                    v-if="modelValue.current_bid_status"
+                    class="ml-1"
+                    :class="
+                        modelValue.current_bid_status == 'Highest' || modelValue.current_bid_status == 'highest'
+                            ? 'text-green-500'
+                            : modelValue.current_bid_status == 'Outbidded' || modelValue.current_bid_status == 'outbidded'
+                              ? 'text-amber-500'
+                              : 'text-red-500'
+                    "
+                >
+                    {{ `(${modelValue.current_bid_status})` }}
+                </p>
             </div>
             <div v-if="isAuctionConfigurable">
-                <div class="mt-4 flex">
+                <div
+                    class="mt-4 flex"
+                    :class="
+                        modelValue.current_bid_status == 'Highest' || modelValue.current_bid_status == 'highest'
+                            ? 'text-green-500'
+                            : modelValue.current_bid_status == 'Outbidded' || modelValue.current_bid_status == 'outbidded'
+                              ? 'text-amber-500'
+                              : 'text-red-500'
+                    "
+                >
                     <div class="mr-2">
                         <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                             <circle cx="12" cy="12" r="9" />
@@ -374,8 +404,14 @@ const saveChanges = async () => {
                 </div>
             </div>
         </TableCell>
-        <TableCell v-if="isAuctionConfigurable">
-            <Button class="cursor-pointer" :class="changeMade ? 'bg-green-500' : ''" :disabled="!changeMade" @click="saveChanges">
+        <TableCell>
+            <Button
+                class="cursor-pointer"
+                :class="changeMade && modelValue.status != 'active' ? 'bg-green-500' : ''"
+                @click="saveChanges"
+                v-if="isAuctionConfigurable"
+            >
+                <!-- :disabled="!changeMade || modelValue.status == 'active'" -->
                 <div v-if="!isSaving">Save</div>
                 <div class="flex" v-else>
                     <svg class="mr-2 h-4 w-4 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -389,10 +425,13 @@ const saveChanges = async () => {
                     <span>Saving</span>
                 </div>
             </Button>
-            <br />
+            <br v-if="isAuctionConfigurable" />
             <!-- <Button class="my-2 cursor-pointer bg-green-500"> Force Bid </Button> -->
-            <br />
-            <Button class="cursor-pointer bg-red-500" @click="dropOff(modelValue.id)"> Drop Off </Button>
+            <br v-if="isAuctionConfigurable" />
+            <Button class="cursor-pointer bg-red-500 text-white" @click="dropOff(modelValue.id)" v-if="isAuctionConfigurable"> Drop Off </Button>
+            <br v-if="isAuctionConfigurable" />
+            <br v-if="isAuctionConfigurable" />
+            <BidsPopover :vehicleName="modelValue.name" :vehicleId="modelValue.id" />
         </TableCell>
     </TableRow>
     <!-- </div> -->

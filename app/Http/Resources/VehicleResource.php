@@ -38,6 +38,7 @@ class VehicleResource extends JsonResource
             'aggressive_stage_increment' => $this->aggressive_stage_increment ? $this->aggressive_stage_increment : 0,
             'sniping_stage_increment' => $this->sniping_stage_increment ? $this->sniping_stage_increment : 0,
             'current_bid' => optional($this->bids->sortByDesc('created_at')->first())->amount,
+            'current_bid_status' => optional($this->bids->sortByDesc('created_at')->first())->status,
             'last_bid_time' => optional($this->bids->sortByDesc('created_at')->first())->created_at,
             'status' => $this->status,
             'bids' => $this->bids

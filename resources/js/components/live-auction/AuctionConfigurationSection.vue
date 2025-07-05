@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import { Button } from '@/components/ui/button';
 import axios from 'axios';
-import { defineEmits, onMounted, ref } from 'vue';
+import { defineEmits, onMounted, onUnmounted, ref } from 'vue';
 import AuctionStagesConfigurationTable from '../widgets/AuctionStagesConfigurationTable.vue';
 import InitiatizationPopover from '../widgets/InitiatizationPopover.vue';
 import Progress from '../widgets/Progress.vue';
@@ -48,6 +47,7 @@ const fetchAuctionDetails = async () => {
             vehicles: response.data.vehicles || [],
         };
         stages.value = auction.value.bid_stages;
+        console.log(auction);
         auctionSessionFetched = true;
     } catch (error) {
         console.log(error);
@@ -98,7 +98,6 @@ const saveAllVehicles = async () => {
 const handleSaveTime = async () => {
     const response = await axios.post('/api/auction/bid_stages/update', stages.value);
     await fetchAuctionDetails();
-    alert(response.data.message);
     await console.log(stages.value);
 };
 // Expose the save method to child components
@@ -113,6 +112,7 @@ function isToday(dateString) {
 
     return inputDate.getTime() == todayUTC;
 }
+
 </script>
 <template>
     <div class="border-sidebar-border/70 dark:border-sidebar-border flex-1 rounded-xl border">
@@ -123,19 +123,18 @@ function isToday(dateString) {
             {{ auction.status }}
         </h3>
         <div class="flex w-full justify-center p-4">
+            <!-- {{ progressValue }} -->
             <Progress
                 disabled
-                :value="1230"
-                :max="1300"
-                :min="1100"
-                :name="`Fuck`"
+                :stage="auction.bid_stage?.name"
+                :name="`Progress`"
                 :startTime="auction.start_time"
-                :end_time="auction.end_time"
+                :endTime="auction.end_time"
                 v-if="isToday(auction.date)"
             />
         </div>
         <div class="flex w-full justify-center p-4" v-if="isToday(auction.date)">
-            <Button :variant="`destructive`" class="mx-4 cursor-pointer"> Bomb! </Button>
+            <!-- <Button :variant="`destructive`" class="mx-4 cursor-pointer"> Bomb! </Button> -->
             <InitiatizationPopover
                 :phillips_accounts_emails="auction.phillips_accounts_emails"
                 :auction_id="auction.id"
@@ -151,15 +150,17 @@ function isToday(dateString) {
                 v-if="auctionSessionFetched"
                 @update:time="handleTimeUpdate"
                 @save:time="handleSaveTime"
+                @vehicle-saved="fetchAuctionDetails"
             />
         </div>
 
         <div class="relative">
             <VehiclesTable
+                :activeStage="auction.bid_stage"
                 :vehicles="auction.vehicles"
                 @update-vehicle="updateVehicle"
                 @update-vehicle-in-DB="fetchAuctionDetails"
-                :isAuctionConfigurable="isToday(auction.date)"
+                :isAuctionConfigurable="isToday(auction.date) && (auction.status == 'configured' || auction.status == 'active')"
             />
         </div>
     </div>

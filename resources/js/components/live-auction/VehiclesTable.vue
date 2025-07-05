@@ -15,10 +15,17 @@ const props = defineProps({
         type: Boolean,
         required: true,
         default: () => (false)
+    },
+    activeStage: {
+        type: Object,
+        required: true,
+        default: () => ({
+            name: "none"
+        })
     }
 });
 
-const emit = defineEmits(['update-vehicle', 'update-vehicle-in-DB']);
+const emit = defineEmits(['update-vehicle', 'update-vehicle-in-DB', 'vehicle-saved']);
 
 // Add this method to handle vehicle updates from rows
 const handleVehicleUpdate = (vehicle, index) => {
@@ -27,6 +34,10 @@ const handleVehicleUpdate = (vehicle, index) => {
 
 const handleVehicleUpdateInDB = () => {
     emit('update-vehicle-in-DB')
+}
+
+const handleVehicleSaved = () => {
+    emit('vehicle-saved')
 }
 
 
@@ -38,16 +49,16 @@ const handleVehicleUpdateInDB = () => {
             <TableCaption>A list of vehicles in the auction.</TableCaption>
             <TableHeader>
                 <TableRow>
-                    <TableHead>Name/ID</TableHead>
+                    <TableHead>Name</TableHead>
                     <TableHead>Start Amount</TableHead>
                     <TableHead>Maximum Amount</TableHead>
                     <TableHead v-if="!isAuctionConfigurable">Total Bids</TableHead>
                     <TableHead>{{ isAuctionConfigurable ? 'Current Bid' : 'Final Bid'}}</TableHead>
                     <TableHead>Status</TableHead>
-                    <TableHead>Lazy Stage Increment</TableHead>
-                    <TableHead>Aggressive Stage Increment</TableHead>
-                    <TableHead>Sniping Stage Increment</TableHead>
-                    <TableHead v-if="isAuctionConfigurable">Actions</TableHead>
+                    <TableHead :class="activeStage?.name == 'lazy' ? 'bg-green-500 text-black': ''">Lazy Stage Increment</TableHead>
+                    <TableHead :class="activeStage?.name == 'aggressive' ? 'bg-amber-500 text-black': ''">Aggressive Stage Increment</TableHead>
+                    <TableHead :class="activeStage?.name == 'sniping' ? 'bg-red-500 text-black': ''">Sniping Stage Increment</TableHead>
+                    <TableHead>Actions</TableHead>
                 </TableRow>
             </TableHeader>
             <TableBody class="max-h-[80vh] min-h-[80vh] overflow-y-auto">
@@ -58,6 +69,7 @@ const handleVehicleUpdateInDB = () => {
                     :index="index"
                     @update:modelValue="handleVehicleUpdate"
                     @update:vehicle-in-db="handleVehicleUpdateInDB"
+                    @vehicle-saved="handleVehicleSaved"
                     :isAuctionConfigurable="isAuctionConfigurable"
                 />
             </TableBody>

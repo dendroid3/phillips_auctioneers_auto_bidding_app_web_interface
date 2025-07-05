@@ -21,16 +21,23 @@ const alerts = ref<
         title: string;
         description: string;
         id: number;
+        time: string
     }>
 >([]);
 const playSuccess = () => {
-    const audio = new Audio('/sounds/success.mp3');
+    const audio = new Audio('/sounds/success_beep.mp3');
     audio.currentTime = 0;
     audio.play();
 };
 
 const playFailure = () => {
-    const audio = new Audio('/sounds/failure.mp3');
+    const audio = new Audio('/sounds/failure_beep.mp3');
+    audio.currentTime = 0;
+    audio.play();
+};
+
+const playNotification = () => {
+    const audio = new Audio('/sounds/notification_beep.mp3');
     audio.currentTime = 0;
     audio.play();
 };
@@ -45,17 +52,19 @@ onMounted(() => {
 
     events.forEach((event) => {
         window.Echo.channel('public-channel').listen(event, (e) => {
-            console.log('Event caught');
             if (e.type == 'success') {
                 playSuccess();
-            } else {
+            } else if (e.type == 'fail') {
                 playFailure();
+            } else {
+                playNotification();
             }
             const newAlert = {
                 id: e.id,
                 type: e.type,
                 title: e.title,
                 description: e.description,
+                time: e.time
             };
             alerts.value.unshift(newAlert);
 
@@ -95,6 +104,7 @@ const handleInitilizationStarted = (response) => {
                             :type="alert.type"
                             :title="alert.title"
                             :description="alert.description"
+                            :time="alert.time"
                             :id="alert.id"
                             @dismiss="removeAlert(alert.id)"
                             class="pointer-events-auto"

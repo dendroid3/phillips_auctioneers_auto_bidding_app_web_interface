@@ -12,10 +12,12 @@ class TestPhillipsAccountCredentials implements ShouldQueue
 
     protected $phillips_account_email;
     protected $phillips_account_password;
-    public function __construct($phillips_account_email, $phillips_account_password)
+    protected $auction_session_id;
+    public function __construct($phillips_account_email, $phillips_account_password, $auction_session_id)
     {
         $this->phillips_account_email = $phillips_account_email;
         $this->phillips_account_password = $phillips_account_password;
+        $this->auction_session_id = $auction_session_id;
     }
 
     /**
@@ -25,13 +27,16 @@ class TestPhillipsAccountCredentials implements ShouldQueue
     {
         $command = [
             'node',
-            '/home/wanjohi/Code/web/phillips/bot/initAuctionSession.js',
+            '/home/wanjohi/Code/web/phillips/puppeteer/initAuctionSession.js',
             '--email',
             $this->phillips_account_email,
             '--password',
-            $this->phillips_account_password
-
+            $this->phillips_account_password,
+            '--auction_session_id',
+            $this->auction_session_id
         ];
+
+        // \Log::info($command);
 
         $process = new Process($command);
         $process->setTimeout(3600); // 1 hour timeout
@@ -40,14 +45,11 @@ class TestPhillipsAccountCredentials implements ShouldQueue
         try {
             $process->run();
 
-            // \Log::info("Command Output: " . $process->getOutput());
-
             if (!$process->isSuccessful()) {
                 throw new \RuntimeException($process->getErrorOutput());
             }
 
         } catch (\Exception $e) {
-            // \Log::error("Command failed: " . $e->getMessage());
             throw $e; // This will trigger the job's failed() method
         }
     }

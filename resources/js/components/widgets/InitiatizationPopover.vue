@@ -16,13 +16,13 @@ const props = defineProps({
     auction_id: {
         type: Number,
         required: true,
-        default: () => 1
+        default: () => 1,
     },
     auction_status: {
         type: String,
         required: true,
-        default: () => "unconfigured"
-    }
+        default: () => 'unconfigured',
+    },
 });
 
 const emit = defineEmits(['intialization:started']);
@@ -33,8 +33,8 @@ onMounted(() => {
     // Get props and add to emailsAndPasswords
     emailsAndPasswords.value = props.phillips_accounts_emails.map((email) => ({
         email: email,
-        email_password: '',
-        phillips_account_password: ''
+        email_app_password: '',
+        phillips_account_password: '',
     }));
 
     console.log(emailsAndPasswords.value);
@@ -44,10 +44,10 @@ const isOpen = ref();
 const initializeAuctionSession = async () => {
     const data = {
         accounts: emailsAndPasswords.value,
-        auction_id: props.auction_id,
-    }
+        auction_session_id: props.auction_id,
+    };
     const response = await axios.post('/api/auction/initialize', data);
-    console.log(data)
+    console.log(data);
     emit('initialization:started', response.data);
     console.log(response.data);
     isOpen.value = false;
@@ -57,11 +57,13 @@ const initializeAuctionSession = async () => {
 <template>
     <Dialog v-model:open="isOpen">
         <DialogTrigger as-child>
-            <Button class="mx-4 cursor-pointer bg-green-500 text-white" :disabled="auction_status != 'unconfigurable'"> Initialize Bidding Session {{ auction_status }}</Button>
-        </DialogTrigger>  
+            <Button class="mx-4 cursor-pointer bg-green-500 text-white" :disabled="auction_status != 'unconfigurable'">
+                Initialize Bidding Session
+            </Button>
+        </DialogTrigger>
         <DialogContent class="sm:max-w-[925px]">
             <DialogHeader>
-                <DialogTitle>Phillips Accounts Emails {{ auction_id }}</DialogTitle>
+                <DialogTitle>Phillips Accounts Email </DialogTitle>
                 <DialogDescription> Enter Passwords for the phillips accounts you want used in this auction session </DialogDescription>
             </DialogHeader>
             <div class="grid gap-2">
@@ -77,10 +79,10 @@ const initializeAuctionSession = async () => {
                         placeholder="Account Password"
                     />
                     <Input
-                        :id="`email_password_${index}`"
+                        :id="`email_app_password_${index}`"
                         type="text"
                         class="col-span-4 h-8"
-                        v-model="emailsAndPasswords[index].email_password"
+                        v-model="emailsAndPasswords[index].email_app_password"
                         placeholder="Email Password"
                     />
                 </div>

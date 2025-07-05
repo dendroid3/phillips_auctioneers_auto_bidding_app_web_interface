@@ -22,15 +22,13 @@ class BidController extends Controller
      */
     public function create(Request $request)
     {
-        // \Log::info($request->all());
         $bid = new Bid();
         $bid->amount = $request->amount;
         $bid->status = $request->status;
         $bid->vehicle_id = $request->vehicle_id;
         $bid->phillips_account_id = PhillipsAccount::query()->where('email', $request->phillips_account_email)->first()->id;
-        $bid->bid_stage_id = 1;
+        $bid->bid_stage_id = $request->bid_stage_id;
         $bid->save();
-
         return response()->json($bid);
     }
 
@@ -44,7 +42,6 @@ class BidController extends Controller
 
         $auction = AuctionSession::query()->where('title', 'LIKE', $firstThreeWords . '%')->first();
 
-        // \Log::info($auction);
         $vehicles = $auction->vehicles;
 
         $vehicle_ids = [];
@@ -56,10 +53,10 @@ class BidController extends Controller
             'vehicle' => function ($query) {
                 $query->select('id', 'phillips_vehicle_id');
             },
-            'phillipsAccount' => function($query) {
+            'phillipsAccount' => function ($query) {
                 $query->select('id', 'email');
             },
-            'bidStage' => function($query){
+            'bidStage' => function ($query) {
                 $query->select('id', 'name');
             }
         ])

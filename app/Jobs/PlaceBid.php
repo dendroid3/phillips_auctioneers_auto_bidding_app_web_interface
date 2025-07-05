@@ -2,10 +2,12 @@
 
 namespace App\Jobs;
 
+use App\Models\Vehicle;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Symfony\Component\Process\Process;
 
+use App\Events\NotificationFromInitAuctionTestEvent;
 class PlaceBid implements ShouldQueue
 {
     use Queueable;
@@ -20,7 +22,8 @@ class PlaceBid implements ShouldQueue
     protected $password;
     protected $vehicle_id;
     protected $vehicle_name;
-    protected $bid_stage;
+    protected $bid_stage_name;
+    protected $bid_stage_id;
 
     public function __construct(
         string $url,
@@ -31,7 +34,8 @@ class PlaceBid implements ShouldQueue
         string $password,
         int $vehicle_id,
         string $vehicle_name,
-        string $bid_stage
+        string $bid_stage_name,
+        int $bid_stage_id
     ) {
         $this->url = $url;
         $this->amount = $amount;
@@ -41,15 +45,36 @@ class PlaceBid implements ShouldQueue
         $this->password = $password;
         $this->vehicle_id = $vehicle_id;
         $this->vehicle_name = $vehicle_name;
-        $this->bid_stage = $bid_stage;
+        $this->bid_stage_name = $bid_stage_name;
+        $this->bid_stage_id = $bid_stage_id;
     }
 
     public function handle(): void
     {
-        \Log::info("Place Bid Called");
+        $vehicle_name = Vehicle::find($this->vehicle_id)->phillips_vehicle_id;
+
+        $formatter = new \NumberFormatter('en_KE', \NumberFormatter::CURRENCY);
+        $formatter->setAttribute(\NumberFormatter::FRACTION_DIGITS, 0);
+        $formatted_bid_amount = $formatter->formatCurrency($this->amount, 'KES');
+        $formatted_increment = $formatter->formatCurrency($this->increment, 'KES');
+
+        $id = \Str::random(10);
+        $type = 'amber';
+        $title = "PLACING BID: " . $vehicle_name . " [" . number_format($this->amount) . "]";
+        $description = "Placing a bid of " .
+            $formatted_bid_amount .
+            " on " .
+            $vehicle_name .
+            ". We will use " .
+            $this->bid_stage_name .
+            "'s increment of " .
+            $formatted_increment .
+            " to chase the highest.";
+        NotificationFromInitAuctionTestEvent::dispatch($id, $type, $title, $description);
+
         $command = [
             'node',
-            '/home/wanjohi/Code/web/phillips/bot/placeBid.js',
+            '/home/wanjohi/Code/web/phillips/puppeteer/placeBid.js',
             '--url',
             $this->url,
             '--amount',
@@ -66,8 +91,10 @@ class PlaceBid implements ShouldQueue
             $this->vehicle_id,
             '--vehicle_name',
             $this->vehicle_name,
-            '--bid_stage',
-            $this->bid_stage
+            '--bid_stage_name',
+            $this->bid_stage_name,
+            '--bid_stage_id',
+            $this->bid_stage_id
         ];
 
         $process = new Process($command);
@@ -78,14 +105,11 @@ class PlaceBid implements ShouldQueue
         try {
             $process->run();
 
-            // \Log::info("Command Output: " . $process->getOutput());
-
             if (!$process->isSuccessful()) {
                 throw new \RuntimeException($process->getErrorOutput());
             }
 
         } catch (\Exception $e) {
-            // \Log::error("Command failed: " . $e->getMessage());
             throw $e; // This will trigger the job's failed() method
         }
     }

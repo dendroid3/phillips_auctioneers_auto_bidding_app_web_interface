@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('phillips_accounts', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id')->index();
-            $table->string('email');
+            $table->string('email')->unique();
             $table->string('account_password')->nullable();
             $table->string('account_status')->default('dormant');
             $table->string('email_app_password')->nullable();

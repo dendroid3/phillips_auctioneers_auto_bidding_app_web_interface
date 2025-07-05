@@ -44,7 +44,8 @@ class NotificationFromInitAuctionTestEvent implements ShouldBroadcast
             "id" => $this->id,
             "type" => $this->type,
             "title" => $this->title,
-            "description" => $this->description
+            "description" => $this->description,
+            "time" => \Carbon\Carbon::now()->format('H:i:s') 
         ];
     }
     public function broadcastAs(): string

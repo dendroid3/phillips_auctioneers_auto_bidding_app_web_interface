@@ -10,16 +10,34 @@ class SnipingController extends Controller
 {
     public function init(Request $request)
     {
-        // \Log::info($request->all());
         $vehicles = Vehicle::query()->where(
             [
-                'auction_session_id' => 1, //$request->auction_account_id,
-                // 'phillips_account_id' => $request->phillips_account_id,
-                // 'status' => 'active'
+                'auction_session_id' => (int) $request->auction_session_id,
+                'phillips_account_id' => (int) $request->phillips_account_id,
+                'status' => 'sniping'
             ]
-        )->take(3)->get();
+        )->get();
 
-        // \Log::info($vehicles);
+        foreach ($vehicles as $vehicle) {
+            $vehicle->url = "http://phillips.adilirealestate.com/bidSuccess.html";
+        }
+
+        return response()->json($vehicles);
+    }
+
+    public function trigger(Request $request)
+    {
+        $vehicles = Vehicle::query()->where(
+            [
+                'auction_session_id' => (int) $request->auction_session_id,
+                'phillips_account_id' => (int) $request->phillips_account_id,
+                'status' => 'sniping'
+            ]
+        )->get();
+
+        foreach ($vehicles as $vehicle) {
+            $vehicle->url = "http://phillips.adilirealestate.com/bidSuccess.html";
+        }
 
         return response()->json($vehicles);
     }

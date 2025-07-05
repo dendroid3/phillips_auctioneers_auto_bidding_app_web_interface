@@ -26,7 +26,7 @@ class ScrapeVehicles implements ShouldQueue
     {
         $command = [
             'node',
-            '/home/wanjohi/Code/web/phillips/bot/scrapeVehicles.js',
+            '/home/wanjohi/Code/web/phillips/puppeteer/scrapeVehicles.js',
             '--url',
             $this->url,
             '--auction_id',
@@ -40,14 +40,11 @@ class ScrapeVehicles implements ShouldQueue
         try {
             $process->run();
 
-            // \Log::info("Command Output: " . $process->getOutput());
-
             if (!$process->isSuccessful()) {
                 throw new \RuntimeException($process->getErrorOutput());
             }
 
         } catch (\Exception $e) {
-            // \Log::error("Command failed: " . $e->getMessage());
             throw $e; // This will trigger the job's failed() method
         }
     }

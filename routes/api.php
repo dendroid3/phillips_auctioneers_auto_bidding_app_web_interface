@@ -77,7 +77,11 @@ Route::group(["prefix" => "vehicle"], function () {
     Route::post("drop", [
         VehicleController::class,
         "dropOff"
-    ]);
+    ])->name('vehicle.drop_off');
+    Route::post("bids", [
+        VehicleController::class,
+        "getbids"
+    ])->name('vehicle.bids');
 });
 
 Route::group(['prefix' => 'sniping'], function () {
@@ -85,6 +89,10 @@ Route::group(['prefix' => 'sniping'], function () {
         SnipingController::class,
         "init"
     ])->name('snipping.init');
+    Route::post('trigger', [
+        SnipingController::class,
+        "trigger"
+    ])->name('sniping.trigger');
 });
 
 Route::group(['prefix' => 'bid'], function () {

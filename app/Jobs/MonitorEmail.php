@@ -14,12 +14,15 @@ class MonitorEmail implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+    public $tries = 1;
     protected $email;
-    protected $email_password;
-    public function __construct($email, $email_password)
+    protected $email_app_password;
+    protected $interval;
+    public function __construct($email, $email_app_password, $interval)
     {
         $this->email = $email;
-        $this->email_password = $email_password;
+        $this->email_app_password = $email_app_password;
+        $this->interval = $interval;
     }
 
     /**
@@ -31,7 +34,8 @@ class MonitorEmail implements ShouldQueue
             'python3',
             '/home/wanjohi/Code/web/phillips/email/index.py',
             $this->email,
-            $this->email_password
+            $this->email_app_password,
+            $this->interval
         ];
 
         $process = new Process($command);
@@ -41,14 +45,11 @@ class MonitorEmail implements ShouldQueue
         try {
             $process->run();
 
-            // \Log::info("Python Command Output: " . $process->getOutput());
-
             if (!$process->isSuccessful()) {
                 throw new \RuntimeException($process->getErrorOutput());
             }
 
         } catch (\Exception $e) {
-            // \Log::error("Python Command failed: " . $e->getMessage());
             throw $e; // This will trigger the job's failed() method
         }
     }
