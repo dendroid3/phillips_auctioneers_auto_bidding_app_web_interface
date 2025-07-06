@@ -177,24 +177,24 @@ Schedule::call(function () {
                         // Change all active vehicles to sniping
                         $vehicles = $activeAuction->vehicles;
                         foreach ($vehicles as $vehicle) {
-                            // if (count($vehicle->bids) > 0) {
-                            //     $vehicle_bid_status = $vehicle->bids()->latest()->status;
+                            if (count($vehicle->bids) > 0) {
+                                $vehicle_bid_status = $vehicle->bids()->latest()->status;
 
-                            //     if ($vehicle_bid_status !== 'Highest' || $vehicle_bid_status !== 'highest') {
-                            //         PlaceBid::dispatch(
-                            //             url: $vehicle->url,
-                            //             amount: $vehicle->maximum_amount,
-                            //             maximum_amount: $vehicle->current_bid,
-                            //             increment: (int) $activeBidStageIncrement,
-                            //             email: $active_account->email,
-                            //             password: $active_account->account_password,
-                            //             vehicle_id: $vehicle->id,
-                            //             vehicle_name: $vehicle->phillips_vehicle_id,
-                            //             bid_stage_name: $bidStage->name,
-                            //             bid_stage_id: $bidStage->id
-                            //         )->onQueue('placeBids');
-                            //     }
-                            // }
+                                if ($vehicle_bid_status !== 'Highest' || $vehicle_bid_status !== 'highest') {
+                                    PlaceBid::dispatch(
+                                        url: $vehicle->url,
+                                        amount: $vehicle->maximum_amount,
+                                        maximum_amount: $vehicle->current_bid,
+                                        increment: (int) $activeBidStageIncrement,
+                                        email: $active_account->email,
+                                        password: $active_account->account_password,
+                                        vehicle_id: $vehicle->id,
+                                        vehicle_name: $vehicle->phillips_vehicle_id,
+                                        bid_stage_name: $bidStage->name,
+                                        bid_stage_id: $bidStage->id
+                                    )->onQueue('placeBids');
+                                }
+                            }
                             if (
                                 $vehicle->start_amount &&
                                 $vehicle->maximum_amount &&

@@ -46,7 +46,7 @@ onMounted(async () => {
         <div class="mb-4 flex justify-center">
             <Button class="cursor-pointer bg-green-500 text-white" @click="forceScrape"> Force Scrape Auctions </Button>
         </div>
-        <Table class="hidden md:block">
+        <Table class="hidden md:block table-fixed">
             <TableCaption>A list of all auctions</TableCaption>
             <TableHeader>
                 <TableRow>
