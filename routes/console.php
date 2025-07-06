@@ -83,7 +83,7 @@ Schedule::call(function () {
                         $activeVehicles = Vehicle::query()->where('status', 'active')->get();
                         foreach ($activeVehicles as $vehicle) {
 
-                            $vehicle_bid_status = $vehicle->bids()->latest()->status;
+                            $vehicle_bid_status = $vehicle->bids()->latest()->value('status');
 
                             if (count($vehicle->bids) > 0) {
                                 if ($vehicle_bid_status !== 'Highest' || $vehicle_bid_status !== 'highest') {
@@ -138,7 +138,7 @@ Schedule::call(function () {
                         $activeVehicles = Vehicle::query()->where('status', 'active')->get();
                         foreach ($activeVehicles as $vehicle) {
                             if (count($vehicle->bids) > 0) {
-                                $vehicle_bid_status = $vehicle->bids()->latest()->status;
+                                $vehicle_bid_status = $vehicle->bids()->latest()->value('status');
 
                                 if ($vehicle_bid_status !== 'Highest' || $vehicle_bid_status !== 'highest') {
                                     $activeBidStageName = $bidStage->name . "_stage_increment";
