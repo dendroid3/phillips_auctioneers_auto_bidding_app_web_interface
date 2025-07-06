@@ -4,7 +4,7 @@ namespace App\Http\Resources;
 
 use App\Models\BidStage;
 use Illuminate\Http\Resources\Json\JsonResource;
-
+use App\Models\Bid;
 class VehicleResource extends JsonResource
 {
     public function toArray($request)
