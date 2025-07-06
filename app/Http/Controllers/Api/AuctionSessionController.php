@@ -319,7 +319,8 @@ class AuctionSessionController extends Controller
         if (
             (int) $lastBidAmount !== (int) $request->current_bid &&
             (int) $vehicle->current_bid !== (int) $request->current_bid &&
-            $activeBidStage->name !== 'sniping'
+            $activeBidStage->name !== 'sniping' &&
+            $activeBidStage->name !== 'aggressive'
         ) {
             if ((int) $vehicle->maximum_amount > ((int) $request->current_bid + (int) $activeBidStageIncrement)) {
                 $id = Str::random(10);
