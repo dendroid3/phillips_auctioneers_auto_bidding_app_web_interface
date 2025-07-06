@@ -30,6 +30,12 @@ class VehicleResource extends JsonResource
                 ];
             }
         }
+        // Get the current highest bid (most recent, and if same time, largest ID last)
+        $currentBid = Bid::where('auction_id', $this->id)
+            ->orderByDesc('created_at')
+            ->orderBy('id') // Ascending order (smaller IDs first)
+            ->first();
+
         return [
             'id' => $this->phillips_vehicle_id,
             'start_amount' => $this->start_amount ? $this->start_amount : 0,
@@ -37,7 +43,8 @@ class VehicleResource extends JsonResource
             'lazy_stage_increment' => $this->lazy_stage_increment ? $this->lazy_stage_increment : 0,
             'aggressive_stage_increment' => $this->aggressive_stage_increment ? $this->aggressive_stage_increment : 0,
             'sniping_stage_increment' => $this->sniping_stage_increment ? $this->sniping_stage_increment : 0,
-            'current_bid' => optional($this->bids->sortByDesc('created_at')->first())->amount,
+            // 'current_bid' => optional($this->bids->sortByDesc('created_at')->first())->amount,
+            'current_bid' => optional($currentBid)->amount;
             'current_bid_status' => optional($this->bids->sortByDesc('created_at')->first())->status,
             'last_bid_time' => optional($this->bids->sortByDesc('created_at')->first())->created_at,
             'status' => $this->status,
