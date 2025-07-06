@@ -66,27 +66,55 @@ const initializeAuctionSession = async () => {
                 <DialogTitle>Phillips Accounts Email </DialogTitle>
                 <DialogDescription> Enter Passwords for the phillips accounts you want used in this auction session </DialogDescription>
             </DialogHeader>
-            <div class="grid gap-2">
-                <div class="flex grid grid-cols-11 items-center gap-4" v-for="(emailsAndPassword, index) in emailsAndPasswords" :key="index">
-                    <Label :for="`${index}-${emailsAndPassword}`" class="col-span-3">
+            <!-- <div class="md:grid md:gap-2">
+                <div class="flex items-center gap-4 md:grid md:grid-cols-11" v-for="(emailsAndPassword, index) in emailsAndPasswords" :key="index">
+                    <Label :for="`${index}-${emailsAndPassword}`" class="md:col-span-3">
                         {{ emailsAndPassword.email }}
                     </Label>
                     <Input
                         :id="`phillips_account_password_${index}`"
                         type="text"
-                        class="col-span-4 h-8"
+                        class="md:col-span-4 h-8"
                         v-model="emailsAndPasswords[index].phillips_account_password"
                         placeholder="Account Password"
                     />
                     <Input
                         :id="`email_app_password_${index}`"
                         type="text"
-                        class="col-span-4 h-8"
+                        class="md:col-span-4 h-8"
+                        v-model="emailsAndPasswords[index].email_app_password"
+                        placeholder="Email Password"
+                    />
+                </div>
+            </div> -->
+
+            <div class="space-y-4">
+                <div v-for="(emailsAndPassword, index) in emailsAndPasswords" :key="index" class="flex flex-col md:grid md:grid-cols-11 md:gap-2">
+                    <!-- Label -->
+                    <Label :for="`${index}-${emailsAndPassword}`" class="mb-1 md:col-span-3 md:mb-0">
+                        {{ emailsAndPassword.email }}
+                    </Label>
+
+                    <!-- Account Password -->
+                    <Input
+                        :id="`phillips_account_password_${index}`"
+                        type="text"
+                        class="mb-2 h-8 md:col-span-4 md:mb-0"
+                        v-model="emailsAndPasswords[index].phillips_account_password"
+                        placeholder="Account Password"
+                    />
+
+                    <!-- Email Password -->
+                    <Input
+                        :id="`email_app_password_${index}`"
+                        type="text"
+                        class="h-8 md:col-span-4"
                         v-model="emailsAndPasswords[index].email_app_password"
                         placeholder="Email Password"
                     />
                 </div>
             </div>
+
             <DialogFooter>
                 <div class="flex justify-center">
                     <Button class="cursor-pointer bg-green-500 text-white" @click="initializeAuctionSession"> Initialize </Button>

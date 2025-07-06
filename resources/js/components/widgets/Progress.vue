@@ -88,12 +88,12 @@ onUnmounted(() => {
 <template>
     <div class="flex">
         <span class="text-sm">{{ props.startTime }}</span>
-        <input type="range" :value="progressValue" :min="progressMin" :max="progressMax" disabled class="w-150 accent-green-500" />
+        <input type="range" :value="progressValue" :min="progressMin" :max="progressMax" disabled class=" accent-green-500" />
         <span class="text-sm">{{ props.endTime }}</span>
 
         <br />
         <div
-            class="fixed top-25 right-25 z-50 rounded p-1 text-center font-mono text-2xl"
+            class="fixed top-0 right-0 z-50 rounded p-1 text-center font-mono text-2xl"
             :class="
                 props.stage == 'lazy'
                     ? 'bg-green-500'

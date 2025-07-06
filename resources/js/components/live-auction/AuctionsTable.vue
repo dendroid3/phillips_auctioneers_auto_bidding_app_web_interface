@@ -1,7 +1,8 @@
 <script setup lang="ts">
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCaption, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import axios from 'axios';
-import { Loader2 } from 'lucide-vue-next';
+import dayjs from 'dayjs';
 import { onMounted, ref } from 'vue';
 import { Button } from '../ui/button';
 import AuctionRow from './AuctionRow.vue';
@@ -17,7 +18,13 @@ const forceScrape = async () => {
     const response = await axios.post('/api/auction/scrape');
 
     alert(response.data.message);
-}
+};
+
+const auctionDate = (auctionDate) => {
+    const date = dayjs(auctionDate).format('D MMM YYYY');
+
+    return date;
+};
 
 onMounted(async () => {
     try {
@@ -37,12 +44,9 @@ onMounted(async () => {
     <div v-if="isLoading">Loading...</div>
     <div v-else>
         <div class="mb-4 flex justify-center">
-            <Button class="cursor-pointer bg-green-500 text-white" @click="forceScrape">
-                Force Scrape Auctions
-                <!-- <Loader2 className="mr-2 h-4 w-4 animate-spin" /> -->
-            </Button>
+            <Button class="cursor-pointer bg-green-500 text-white" @click="forceScrape"> Force Scrape Auctions </Button>
         </div>
-        <Table>
+        <Table class="hidden md:block">
             <TableCaption>A list of all auctions</TableCaption>
             <TableHeader>
                 <TableRow>
@@ -55,12 +59,85 @@ onMounted(async () => {
                     <TableHead>Won</TableHead>
                     <TableHead>Lost</TableHead>
                     <TableHead>Out Budgeted</TableHead>
-                
                 </TableRow>
             </TableHeader>
             <TableBody class="max-h-[80vh] min-h-[80vh] overflow-y-auto">
                 <AuctionRow v-for="auction in auctions" :key="auction.id" :auction="auction" @click="goToAuction(auction.title)" />
             </TableBody>
         </Table>
+        <Card class="block md:hidden" v-for="auction in auctions" :key="auction.id" :auction="auction">
+            <CardHeader>
+                <CardTitle>{{ auction.title }}</CardTitle>
+                <!-- <CardDescription>Configure Bid Stage Times.</CardDescription> -->
+            </CardHeader>
+            <CardContent class="mt-3">
+                <div class="mb-2 space-y-1">
+                    <p class="text-md leading-none font-medium">
+                        {{ 'Date: ' }}
+                        <span class="text-muted-foreground text-md">
+                            {{ auctionDate(auction.date) }}
+                        </span>
+                    </p>
+                </div>
+
+                <div class="mb-2 space-y-1">
+                    <p class="text-md leading-none font-medium">
+                        {{ 'Status: ' }}
+                        <span class="text-muted-foreground text-md">
+                            {{ auction.status }}
+                        </span>
+                    </p>
+                </div>
+
+                <div class="mb-2 space-y-1">
+                    <p class="text-md leading-none font-medium">
+                        {{ 'Vehicles: ' }}
+                        <span class="text-muted-foreground text-md">
+                            {{ auction.total_vehicles_count }}
+                        </span>
+                    </p>
+                </div>
+
+                <div class="mb-2 space-y-1">
+                    <p class="text-md leading-none font-medium">
+                        {{ 'Unconfigured: ' }}
+                        <span class="text-muted-foreground text-md">
+                            {{ auction.total_vehicles_count }}
+                        </span>
+                    </p>
+                </div>
+
+                <div class="mb-2 space-y-1">
+                    <p class="text-md leading-none font-medium">
+                        {{ 'Won: ' }}
+                        <span class="text-muted-foreground text-md">
+                            {{ auction.total_vehicles_count }}
+                        </span>
+                    </p>
+                </div>
+
+                <div class="mb-2 space-y-1">
+                    <p class="text-md leading-none font-medium">
+                        {{ 'Lost: ' }}
+                        <span class="text-muted-foreground text-md">
+                            {{ auction.total_vehicles_count }}
+                        </span>
+                    </p>
+                </div>
+
+                <div class="mb-2 space-y-1">
+                    <p class="text-md leading-none font-medium">
+                        {{ 'Out Budgeted: ' }}
+                        <span class="text-muted-foreground text-md">
+                            {{ auction.total_vehicles_count }}
+                        </span>
+                    </p>
+                </div>
+            </CardContent>
+
+            <CardFooter class="flex justify-center px-6 pt-3 pb-2">
+                <Button class="mx-4 cursor-pointer bg-green-500 text-white" @click="goToAuction(auction.title)"> View </Button>
+            </CardFooter>
+        </Card>
     </div>
 </template>

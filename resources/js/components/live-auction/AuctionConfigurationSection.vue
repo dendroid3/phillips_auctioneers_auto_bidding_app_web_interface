@@ -154,7 +154,7 @@ function isToday(dateString) {
             />
         </div>
 
-        <div class="relative">
+        <div class="">
             <VehiclesTable
                 :activeStage="auction.bid_stage"
                 :vehicles="auction.vehicles"

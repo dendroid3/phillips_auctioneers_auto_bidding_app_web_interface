@@ -37,7 +37,7 @@ const close = () => {
 
 <template>
     <Alert
-        class="w-150 border p-4"
+        class="md:w-150 border p-4"
         :class="
             props.type == 'success'
                 ? 'border-green-500 text-green-500'

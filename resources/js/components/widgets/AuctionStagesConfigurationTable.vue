@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { defineEmits, defineProps, ref, computed } from 'vue';
+import { defineEmits, defineProps, ref } from 'vue';
+
 const props = defineProps({
     stages: {
         type: Object,
@@ -10,32 +12,28 @@ const props = defineProps({
             lazy_stage: {
                 start_time: '',
                 end_time: '',
-                status: ''
+                status: '',
             },
             aggressive_stage: {
                 start_time: '',
                 end_time: '',
-                stage: ''
+                stage: '',
             },
-                sniping_stage: {
+            sniping_stage: {
                 start_time: '',
                 end_time: '',
-                stage: ''
-            }
+                stage: '',
+            },
         }),
         validator: (value) => {
-            return [
-                'lazy_stage',
-                'aggressive_stage',
-                'sniping_stage'
-            ].every(stage => value[stage]);
-        }
+            return ['lazy_stage', 'aggressive_stage', 'sniping_stage'].every((stage) => value[stage]);
+        },
     },
     isAuctionConfigurable: {
         type: Boolean,
         required: true,
-        default: false
-    }
+        default: false,
+    },
 });
 const emit = defineEmits<{
     (e: 'update:time', payload: { stageName: string; field: 'start_time' | 'end_time'; value: string }): void;
@@ -154,17 +152,15 @@ const updateTime = (value: string, nestedPath: string) => {
 };
 
 const saveTime = () => {
-    emit('save:time')
-    console.log("Should emit")
-}
+    emit('save:time');
+    console.log('Should emit');
+};
 </script>
 <template>
     <div>
-        <Table>
+        <Table class="hidden md:block">
             <TableCaption>
-                <Button class="mx-4 cursor-pointer bg-green-500 text-white" :disabled="!changeMade" @click="saveTime"> 
-                    Save
-                </Button>
+                <Button class="mx-4 cursor-pointer bg-green-500 text-white" :disabled="!changeMade" @click="saveTime"> Save </Button>
             </TableCaption>
             <TableHeader>
                 <TableRow>
@@ -258,5 +254,97 @@ const saveTime = () => {
                 </TableRow>
             </TableBody>
         </Table>
+        <Card class="block md:hidden">
+            <CardHeader>
+                <CardTitle>Bid Stages </CardTitle>
+                <CardDescription>Configure Bid Stage Times.</CardDescription>
+            </CardHeader>
+            <CardContent>
+
+                <CardDescription>Lazy Stage</CardDescription>
+                <div class="flex flex-row space-x-2">
+                    <!-- Lazy Stage - Start Time -->
+                    <div class="relative">
+                        <input
+                            :disabled="!isAuctionConfigurable"
+                            :class="!isAuctionConfigurable ? 'bg-yellow-900' : ''"
+                            type="time"
+                            :value="stages.lazy_stage.start_time"
+                            @input="updateTime($event.target.value, 'lazy_stage.start_time')"
+                            @focus="$event.target.showPicker()"
+                            class="w-35 rounded-md border border-gray-300 px-2 py-1 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
+                        />
+                    </div>
+
+                    <!-- Lazy Stage - End Time -->
+                    <div class="relative">
+                        <input
+                            disabled
+                            type="time"
+                            :value="stages.lazy_stage.end_time"
+                            @input="updateTime($event.target.value, 'lazy_stage.end_time')"
+                            @focus="$event.target.showPicker()"
+                            class="w-35 rounded-md border border-gray-300 bg-yellow-900 px-2 py-1 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
+                        />
+                    </div>
+                </div>
+
+                <CardDescription class="mt-3">Aggressive Stage</CardDescription>
+                <div class="flex flex-row space-x-2">
+                    <!-- Aggressive Stage - Start Time -->
+                    <div class="relative">
+                        <input
+                            type="time"
+                            :value="stages.aggressive_stage.start_time"
+                            @input="updateTime($event.target.value, 'aggressive_stage.start_time')"
+                            @focus="$event.target.showPicker()"
+                            disabled
+                            class="w-35 rounded-md border border-gray-300 bg-yellow-900 px-2 py-1 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
+                        />
+                    </div>
+
+                    <!-- Aggressive Stage - End Time -->
+                    <div class="relative">
+                        <input
+                            type="time"
+                            :value="stages.aggressive_stage.end_time"
+                            disabled
+                            class="w-35 rounded-md border border-gray-300 bg-yellow-900 px-2 py-1 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
+                        />
+                    </div>
+                </div>
+
+                <CardDescription class="mt-3">Sniping Stage</CardDescription>
+                <div class="flex flex-row space-x-2">
+                    <!-- Sniping Stage - Start Time -->
+                    <div class="relative">
+                        <input
+                            type="time"
+                            :value="stages.sniping_stage.start_time"
+                            @input="updateTime($event.target.value, 'sniping_stage.start_time')"
+                            disabled
+                            @focus="$event.target.showPicker()"
+                            class="w-35 rounded-md border border-gray-300 bg-yellow-900 px-2 py-1 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
+                        />
+                    </div>
+
+                    <!-- Sniping Stage - End Time -->
+                    <div class="relative">
+                        <input
+                            type="time"
+                            :value="stages.sniping_stage.end_time"
+                            @input="updateTime($event.target.value, 'sniping_stage.end_time')"
+                            @focus="$event.target.showPicker()"
+                            disabled
+                            class="w-35 rounded-md border border-gray-300 bg-yellow-900 px-2 py-1 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
+                        />
+                    </div>
+                </div>
+            </CardContent>
+            <CardFooter class="flex justify-center px-6 pb-2 pt-3">
+
+                <Button class="mx-4 cursor-pointer bg-green-500 text-white" :disabled="!changeMade" @click="saveTime"> Save </Button>
+            </CardFooter>
+        </Card>
     </div>
 </template>

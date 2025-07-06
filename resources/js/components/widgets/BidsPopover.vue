@@ -23,14 +23,23 @@ const props = defineProps({
 </style>
 <template>
     <Dialog>
-        <DialogTrigger as-child>
-            <Button class="cursor-pointer bg-green-500 text-white"> View </Button>
-        </DialogTrigger>
-        <DialogContent class="sm:max-w-[925px] max-h-[700px] overflow-y-scroll scrollbar-hide">
-            <DialogHeader>
-                <DialogTitle class="text-center"> {{ `BIDS FOR ${props.vehicleId}` }} </DialogTitle>
-                <BidsTable :vehicleId="props.vehicleId"/>
-            </DialogHeader>
-        </DialogContent>
-    </Dialog>
+  <DialogTrigger as-child>
+    <Button class="cursor-pointer bg-green-500 text-white">View</Button>
+  </DialogTrigger>
+
+  <DialogContent class="sm:max-w-[925px] max-h-[700px] overflow-hidden">
+    <DialogHeader class="border-b pb-2">
+      <DialogTitle class="text-center">
+        {{ `BIDS FOR ${props.vehicleId}` }}
+      </DialogTitle>
+    </DialogHeader>
+
+    <!-- Scrollable content area -->
+    <div class="overflow-y-auto max-h-[640px] scrollbar-hide">
+      <!-- Adjust max-h here to leave room for title/header (700px - ~60px) -->
+      <BidsTable :vehicleId="props.vehicleId" :isPopover="true" />
+    </div>
+  </DialogContent>
+</Dialog>
+
 </template>

@@ -5,6 +5,8 @@ import { defineEmits, defineProps } from 'vue';
 
 import VehicleRow from './VehicleRow.vue';
 
+import VehicleCard from './VehicleCard.vue';
+
 const props = defineProps({
     vehicles: {
         type: Object,
@@ -14,15 +16,15 @@ const props = defineProps({
     isAuctionConfigurable: {
         type: Boolean,
         required: true,
-        default: () => (false)
+        default: () => false,
     },
     activeStage: {
         type: Object,
         required: true,
         default: () => ({
-            name: "none"
-        })
-    }
+            name: 'none',
+        }),
+    },
 });
 
 const emit = defineEmits(['update-vehicle', 'update-vehicle-in-DB', 'vehicle-saved']);
@@ -33,19 +35,17 @@ const handleVehicleUpdate = (vehicle, index) => {
 };
 
 const handleVehicleUpdateInDB = () => {
-    emit('update-vehicle-in-DB')
-}
+    emit('update-vehicle-in-DB');
+};
 
 const handleVehicleSaved = () => {
-    emit('vehicle-saved')
-}
-
-
+    emit('vehicle-saved');
+};
 </script>
 
 <template>
     <div>
-        <Table>
+        <Table class="hidden md:table w-full">
             <TableCaption>A list of vehicles in the auction.</TableCaption>
             <TableHeader>
                 <TableRow>
@@ -53,11 +53,11 @@ const handleVehicleSaved = () => {
                     <TableHead>Start Amount</TableHead>
                     <TableHead>Maximum Amount</TableHead>
                     <TableHead v-if="!isAuctionConfigurable">Total Bids</TableHead>
-                    <TableHead>{{ isAuctionConfigurable ? 'Current Bid' : 'Final Bid'}}</TableHead>
+                    <TableHead>{{ isAuctionConfigurable ? 'Current Bid' : 'Final Bid' }}</TableHead>
                     <TableHead>Status</TableHead>
-                    <TableHead :class="activeStage?.name == 'lazy' ? 'bg-green-500 text-black': ''">Lazy Stage Increment</TableHead>
-                    <TableHead :class="activeStage?.name == 'aggressive' ? 'bg-amber-500 text-black': ''">Aggressive Stage Increment</TableHead>
-                    <TableHead :class="activeStage?.name == 'sniping' ? 'bg-red-500 text-black': ''">Sniping Stage Increment</TableHead>
+                    <TableHead :class="activeStage?.name == 'lazy' ? 'bg-green-500 text-black' : ''">Lazy Stage Increment</TableHead>
+                    <TableHead :class="activeStage?.name == 'aggressive' ? 'bg-amber-500 text-black' : ''">Aggressive Stage Increment</TableHead>
+                    <TableHead :class="activeStage?.name == 'sniping' ? 'bg-red-500 text-black' : ''">Sniping Stage Increment</TableHead>
                     <TableHead>Actions</TableHead>
                 </TableRow>
             </TableHeader>
@@ -74,5 +74,17 @@ const handleVehicleSaved = () => {
                 />
             </TableBody>
         </Table>
+        <div class="block md:hidden p-2">
+            <VehicleCard
+                v-for="(vehicle, index) in $props.vehicles"
+                :key="index"
+                :modelValue="vehicle"
+                :index="index"
+                @update:modelValue="handleVehicleUpdate"
+                @update:vehicle-in-db="handleVehicleUpdateInDB"
+                @vehicle-saved="handleVehicleSaved"
+                :isAuctionConfigurable="isAuctionConfigurable"
+            />
+        </div>
     </div>
 </template>
