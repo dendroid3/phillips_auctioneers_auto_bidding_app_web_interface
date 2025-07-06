@@ -147,18 +147,18 @@ Schedule::call(function () {
                                     $activeBidStageIncrement = $vehicle->$activeBidStageName;
 
                                     \Log::info("Placing from console, line 149");
-                                    PlaceBid::dispatch(
-                                        url: $vehicle->url,
-                                        amount: $vehicle->maximum_amount,
-                                        maximum_amount: $vehicle->current_bid,
-                                        increment: (int) $activeBidStageIncrement,
-                                        email: $active_account->email,
-                                        password: $active_account->account_password,
-                                        vehicle_id: $vehicle->id,
-                                        vehicle_name: $vehicle->phillips_vehicle_id,
-                                        bid_stage_name: $bidStage->name,
-                                        bid_stage_id: $bidStage->id
-                                    )->onQueue('placeBids');
+                                    // PlaceBid::dispatch(
+                                    //     url: $vehicle->url,
+                                    //     amount: $vehicle->maximum_amount,
+                                    //     maximum_amount: $vehicle->current_bid,
+                                    //     increment: (int) $activeBidStageIncrement,
+                                    //     email: $active_account->email,
+                                    //     password: $active_account->account_password,
+                                    //     vehicle_id: $vehicle->id,
+                                    //     vehicle_name: $vehicle->phillips_vehicle_id,
+                                    //     bid_stage_name: $bidStage->name,
+                                    //     bid_stage_id: $bidStage->id
+                                    // )->onQueue('placeBids');
                                 }
                             }
                         }
