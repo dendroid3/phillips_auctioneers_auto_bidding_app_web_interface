@@ -180,7 +180,12 @@ Schedule::call(function () {
                             if (count($vehicle->bids) > 0) {
                                 $vehicle_bid_status = $vehicle->bids()->latest()->status;
 
-                                if ($vehicle_bid_status !== 'Highest' || $vehicle_bid_status !== 'highest') {
+                                if (
+                                    $vehicle_bid_status !== 'Outbudgeted' ||
+                                    $vehicle_bid_status !== 'outbudgeted' ||
+                                    $vehicle_bid_status !== 'Highest' ||
+                                    $vehicle_bid_status !== 'highest'
+                                ) {
                                     PlaceBid::dispatch(
                                         url: $vehicle->url,
                                         amount: $vehicle->maximum_amount,
