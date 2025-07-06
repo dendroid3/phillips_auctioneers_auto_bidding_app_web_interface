@@ -99,6 +99,7 @@ class PlaceBid implements ShouldQueue
 
         $process = new Process($command);
 
+        \Log::info($command);
         $process->setTimeout(3600); // 1 hour timeout
         $process->setIdleTimeout(300);
 
