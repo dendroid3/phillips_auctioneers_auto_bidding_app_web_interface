@@ -322,6 +322,7 @@ class AuctionSessionController extends Controller
             $activeBidStage->name !== 'sniping' &&
             $activeBidStage->name !== 'aggressive'
         ) {
+            \Log::info("Inside");
             if ((int) $vehicle->maximum_amount > ((int) $request->current_bid + (int) $activeBidStageIncrement)) {
                 $id = Str::random(10);
                 $type = 'fail';
