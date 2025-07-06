@@ -89,6 +89,7 @@ Schedule::call(function () {
                                 if ($vehicle_bid_status !== 'Highest' || $vehicle_bid_status !== 'highest') {
                                     $activeBidStageName = $bidStage->name . "_stage_increment";
                                     $activeBidStageIncrement = $vehicle->$activeBidStageName;
+                                    \Log::info("Placing from console, line 92");
                                     PlaceBid::dispatch(
                                         url: $vehicle->url,
                                         amount: $vehicle->maximum_amount,
@@ -105,6 +106,7 @@ Schedule::call(function () {
                             } else {
                                 $activeBidStageName = $bidStage->name . "_stage_increment";
                                 $activeBidStageIncrement = $vehicle->$activeBidStageName;
+                                \Log::info("Placing from console, line 109");
                                 PlaceBid::dispatch(
                                     url: $vehicle->url,
                                     amount: $vehicle->maximum_amount,
@@ -144,6 +146,7 @@ Schedule::call(function () {
                                     $activeBidStageName = $bidStage->name . "_stage_increment";
                                     $activeBidStageIncrement = $vehicle->$activeBidStageName;
 
+                                    \Log::info("Placing from console, line 149");
                                     PlaceBid::dispatch(
                                         url: $vehicle->url,
                                         amount: $vehicle->maximum_amount,
@@ -186,6 +189,8 @@ Schedule::call(function () {
                                     $vehicle_bid_status !== 'Highest' ||
                                     $vehicle_bid_status !== 'highest'
                                 ) {
+
+                                    \Log::info("Placing from console, line 193");
                                     PlaceBid::dispatch(
                                         url: $vehicle->url,
                                         amount: $vehicle->maximum_amount,

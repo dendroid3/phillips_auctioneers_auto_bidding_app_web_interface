@@ -344,6 +344,7 @@ class AuctionSessionController extends Controller
                 ;
                 NotificationFromInitAuctionTestEvent::dispatch($id, $type, $title, $description);
 
+                \Log::info("Placing from email");
                 PlaceBid::dispatch(
                     url: $request->url,
                     amount: $request->current_bid + (int) $activeBidStageIncrement,
