@@ -213,8 +213,14 @@ Schedule::call(function () {
                                 $vehicle->sniping_stage_increment &&
                                 $vehicle->status !== 'Outbudgeted' &&
                                 $vehicle->status !== 'outbudgeted' &&
-                                $vehicle->status !== 'dropped'
+                                $vehicle->status !== 'dropped' &&
+                                $vehicle->status !== 'Dropped' &&
+                                $vehicle->status !== 'Unconfigured' &&
+                                $vehicle->status !== 'unconfigured' &&
+                                $vehicle->status !== 'Unconfigurable' &&
+                                $vehicle->status !== 'unconfigurable'
                             ) {
+                                \Log::info("Line 223");
                                 $vehicle->status = 'sniping';
                                 $vehicle->push();
                             }

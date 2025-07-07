@@ -102,7 +102,7 @@ onMounted(async () => {
                     <p class="text-md leading-none font-medium">
                         {{ 'Unconfigured: ' }}
                         <span class="text-muted-foreground text-md">
-                            {{ auction.total_vehicles_count }}
+                            {{ auction.unconfigured_vehicles_count }}
                         </span>
                     </p>
                 </div>
@@ -111,7 +111,7 @@ onMounted(async () => {
                     <p class="text-md leading-none font-medium">
                         {{ 'Won: ' }}
                         <span class="text-muted-foreground text-md">
-                            {{ auction.total_vehicles_count }}
+                            {{ auction.won_vehicles_count }}
                         </span>
                     </p>
                 </div>
@@ -120,7 +120,7 @@ onMounted(async () => {
                     <p class="text-md leading-none font-medium">
                         {{ 'Lost: ' }}
                         <span class="text-muted-foreground text-md">
-                            {{ auction.total_vehicles_count }}
+                            {{ auction.lost_vehicles_count }}
                         </span>
                     </p>
                 </div>
@@ -129,7 +129,7 @@ onMounted(async () => {
                     <p class="text-md leading-none font-medium">
                         {{ 'Out Budgeted: ' }}
                         <span class="text-muted-foreground text-md">
-                            {{ auction.total_vehicles_count }}
+                            {{ auction.outbudgeted_vehicles_count }}
                         </span>
                     </p>
                 </div>
