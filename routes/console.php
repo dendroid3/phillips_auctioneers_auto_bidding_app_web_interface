@@ -13,7 +13,7 @@ use Symfony\Component\Process\Process;
 
 function isProcessRunning($email, $password, $interval)
 {
-    $pattern = "python3 /home/wanjohi/Code/web/phillips/email/index.py $email $password $interval";
+    $pattern = "python3 " . env('EMAIL_BASE_PATH') . "index.py $email $password $interval";
     $escapedPattern = escapeshellarg($pattern);
 
     $cmd = "pgrep -f $escapedPattern";
