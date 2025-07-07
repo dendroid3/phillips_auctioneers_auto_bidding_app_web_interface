@@ -60,8 +60,9 @@ class BidController extends Controller
                 $query->select('id', 'name');
             }
         ])
-            ->whereIn("vehicle_id", $vehicle_ids) // plural if array of IDs
+            ->whereIn("vehicle_id", $vehicle_ids) 
             ->orderBy('created_at', 'desc')
+            ->orderBy('id', 'desc')
             ->get();
         return response()->json($bids);
         // return true;

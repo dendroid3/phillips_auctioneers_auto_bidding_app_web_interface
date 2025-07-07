@@ -153,8 +153,9 @@ class VehicleController extends Controller
                 $query->select('id', 'name');
             }
         ])
-            ->where("vehicle_id", $vehicle->id) // plural if array of IDs
+            ->where("vehicle_id", $vehicle->id)
             ->orderBy('created_at', 'desc')
+            ->orderBy('id', 'desc')
             ->get();
         return response()->json($bids);
     }

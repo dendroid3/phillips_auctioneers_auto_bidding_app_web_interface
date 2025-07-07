@@ -302,7 +302,7 @@ const saveChanges = async () => {
             <!-- Bids Count (static if not configurable) -->
             <TableCell class="w-full" v-if="!isAuctionConfigurable">
                 <div class="w-full p-2 text-center">
-                    {{ modelValue.bids.length }}
+                    {{ `Bids: ${modelValue.bids.length}` }}
                 </div>
             </TableCell>
 

@@ -278,7 +278,7 @@ class AuctionSessionController extends Controller
             $phillips_account->account_status = "failed";
             $phillips_account->push();
 
-            \Log::info($request ->all());
+            \Log::info($request->all());
             $auction_session = AuctionSession::find($request->account_session_id);
             $auction_session->status = "unconfigurable";
             $auction_session->push();
@@ -311,23 +311,25 @@ class AuctionSessionController extends Controller
             ->inRandomOrder()
             ->first();
 
-
         // Get active Stage 
         $activeBidStage = BidStage::query()->where('auction_session_id', $auction->id)->where('status', 'active')->first();
         $activeBidStageName = $activeBidStage->name . "_stage_increment";
         $activeBidStageIncrement = $vehicle->$activeBidStageName;
+
         if (
             (int) $lastBidAmount !== (int) $request->current_bid &&
             (int) $vehicle->current_bid !== (int) $request->current_bid &&
-            $activeBidStage->name !== 'sniping' &&
-            $activeBidStage->name !== 'aggressive'
+            (int) $vehicle->maximum_amount > $request->current_bid &&
+            $activeBidStage->name !== 'sniping'
         ) {
-            \Log::info("Inside");
-            if ((int) $vehicle->maximum_amount > ((int) $request->current_bid + (int) $activeBidStageIncrement)) {
+            if (
+                (int) $vehicle->maximum_amount > ((int) $request->current_bid + (int) $activeBidStageIncrement)
+            ) {
                 $id = Str::random(10);
                 $type = 'fail';
                 $title = "TOPPLED: " . $vehicle->phillips_vehicle_id . " [" . number_format($request->current_bid, 0) . "]";
-                $description = "We've received an email that " . $vehicle->phillips_vehicle_id .
+                $description = "We've received an email on the email address " . $request->email .
+                    " that " . $vehicle->phillips_vehicle_id .
                     " has been out bidded by a competitor who bid " .
                     $request->current_bid .
                     ". We are placing a new bid starting at " .
@@ -344,7 +346,6 @@ class AuctionSessionController extends Controller
                 ;
                 NotificationFromInitAuctionTestEvent::dispatch($id, $type, $title, $description);
 
-                \Log::info("Placing from email");
                 PlaceBid::dispatch(
                     url: $request->url,
                     amount: $request->current_bid + (int) $activeBidStageIncrement,
@@ -358,7 +359,9 @@ class AuctionSessionController extends Controller
                     bid_stage_id: $activeBidStage->id
                 )->onQueue('placeBids');
                 // return
-            } else if ((int) $vehicle->maximum_amount < ((int) $request->current_bid + (int) $activeBidStageIncrement)) {
+            } else if (
+                (int) $vehicle->maximum_amount < ((int) $request->current_bid + (int) $activeBidStageIncrement)
+            ) {
                 $id = Str::random(10);
                 $type = 'fail';
                 $title = "TOPPLED: " . $vehicle->phillips_vehicle_id;
@@ -376,7 +379,7 @@ class AuctionSessionController extends Controller
                     url: $request->url,
                     amount: $vehicle->maximum_amount,
                     maximum_amount: $vehicle->maximum_amount,
-                    increment: (int) $activeBidStageIncrement,
+                    increment: 0,
                     email: $active_account->email,
                     password: $active_account->account_password,
                     vehicle_id: $vehicle->id,
@@ -384,32 +387,22 @@ class AuctionSessionController extends Controller
                     bid_stage_name: $activeBidStage->name,
                     bid_stage_id: $activeBidStage->id
                 )->onQueue('placeBids');
-            } else {
-                $vehicle->status = "outbudgeted";
-                $vehicle->push();
-                $id = Str::random(10);
-                $type = 'fail';
-                $title = "OUTBUDGETED: " . $vehicle->phillips_vehicle_id;
-                $description = $vehicle->phillips_vehicle_id . " has been out outbudgeted by " . $request->current_bid . ". We will no longer bid on this vehicle.";
-                NotificationFromInitAuctionTestEvent::dispatch($id, $type, $title, $description);
             }
-
-            $bid = new Bid;
-            $bid->vehicle_id = $vehicle->id;
-            $bid->phillips_account_id = PhillipsAccount::query()->where('email', 'competitor@example.com')->first()->id;
-            $bid->bid_stage_id = $activeBidStage->id;
-            $bid->status = "Toppled";
-            $bid->amount = (int) $request->current_bid;
-            $bid->save();
-
-            $vehicle->current_bid = (int) $request->current_bid;
-            $vehicle->push();
-
-        } else if ((int) $lastBidAmount !== (int) $request->current_bid && $activeBidStage->name == 'sniping') {
+        } else if (
+            (int) $lastBidAmount !== (int) $request->current_bid &&
+            $activeBidStage->name == 'sniping'
+        ) {
             // Here we just change the vehicle status in wait for sniping
             $vehicle->status = "sniping";
             $vehicle->push();
+        }
 
+        \Log::info("lastBidAmount " . $lastBidAmount . "request -> current_bid: " . $request->current_bid . "vehicle -> current_bid: " . $vehicle->current_bid);
+        if (
+            (int) $lastBidAmount !== (int) $request->current_bid &&
+            (int) $vehicle->current_bid !== (int) $request->current_bid
+        ) {
+            \Log::info("We inside here 407");
             $bid = new Bid;
             $bid->vehicle_id = $vehicle->id;
             $bid->phillips_account_id = PhillipsAccount::query()->where('email', 'competitor@example.com')->first()->id;
@@ -417,11 +410,42 @@ class AuctionSessionController extends Controller
             $bid->status = "Toppled";
             $bid->amount = $request->current_bid;
             $bid->save();
+        } else if (
+            (int) $lastBidAmount == (int) $request->current_bid &&
+            (int) $vehicle->current_bid == (int) $request->current_bid
+        ) {
+            // Friendly fire
+            $id = Str::random(10);
+            $type = 'amber';
+            $title = "FRIENDLY FIRE: " . $vehicle->phillips_vehicle_id . " [" . number_format($request->current_bid, 0) . "]";
+            $description = "We've received an email on the email address " . $request->email .
+                " that " . $vehicle->phillips_vehicle_id .
+                " has been out bidded by a competitor who bid " .
+                $request->current_bid .
+                ". We placed a bid of a similar amount. This is friendly fire, we will not place another bid.";
+            NotificationFromInitAuctionTestEvent::dispatch($id, $type, $title, $description);
         }
+
+        if (
+            (int) $vehicle->maximum_amount < $request->current_bid
+        ) {
+            $bid = new Bid;
+            $bid->vehicle_id = $vehicle->id;
+            $bid->phillips_account_id = PhillipsAccount::query()->where('email', 'competitor@example.com')->first()->id;
+            $bid->bid_stage_id = $activeBidStage->id;
+            $bid->status = "Outbudgeted";
+            $bid->amount = $request->current_bid;
+            $bid->save();
+        }
+
+        $vehicle->current_bid = (int) $request->current_bid;
+        $vehicle->push();
+
     }
 
     public function scrape(Request $request)
     {
+        \Log::info("scrapping vehicles");
         ScrapeAuctions::Dispatch();
 
         return response()->json([
