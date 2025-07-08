@@ -186,7 +186,7 @@ Schedule::call(function () {
                         $vehicles = $activeAuction->vehicles;
                         foreach ($vehicles as $vehicle) {
                             if (count($vehicle->bids) > 0) {
-                                $vehicle_bid_status = $vehicle->bids()->latest()->status;
+                                $vehicle_bid_status = $vehicle->bids()->latest()->value('status');
 
                                 if (
                                     $vehicle_bid_status !== 'Outbudgeted' ||
@@ -196,18 +196,18 @@ Schedule::call(function () {
                                 ) {
 
                                     \Log::info("Placing from console, line 193");
-                                    PlaceBid::dispatch(
-                                        url: $vehicle->url,
-                                        amount: $vehicle->maximum_amount,
-                                        maximum_amount: $vehicle->current_bid,
-                                        increment: (int) $activeBidStageIncrement,
-                                        email: $active_account->email,
-                                        password: $active_account->account_password,
-                                        vehicle_id: $vehicle->id,
-                                        vehicle_name: $vehicle->phillips_vehicle_id,
-                                        bid_stage_name: $bidStage->name,
-                                        bid_stage_id: $bidStage->id
-                                    )->onQueue('placeBids');
+                                    // PlaceBid::dispatch(
+                                    //     url: $vehicle->url,
+                                    //     amount: $vehicle->current_bid,
+                                    //     maximum_amount: $vehicle->maximum_amount,
+                                    //     increment: (int) $activeBidStageIncrement,
+                                    //     email: $active_account->email,
+                                    //     password: $active_account->account_password,
+                                    //     vehicle_id: $vehicle->id,
+                                    //     vehicle_name: $vehicle->phillips_vehicle_id,
+                                    //     bid_stage_name: $bidStage->name,
+                                    //     bid_stage_id: $bidStage->id
+                                    // )->onQueue('placeBids');
                                 }
                             }
                             if (
@@ -244,7 +244,7 @@ Schedule::call(function () {
                             // Start the process
                             $command = [
                                 'python3',
-                                '/home/wanjohi/Code/web/phillips/email/index.py',
+                                env('EMAIL_BASE_PATH').'/index.py',
                                 $email,
                                 $password,
                                 $interval
@@ -259,7 +259,6 @@ Schedule::call(function () {
 
                             // call sniping script
                         }
-
 
                     }
                 } else {
@@ -279,5 +278,5 @@ Schedule::call(function () {
             $activeAuction->push();
         }
     }
-})->everyMinute();
+})->everyFiveSeconds();
 

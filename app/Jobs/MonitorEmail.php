@@ -32,7 +32,7 @@ class MonitorEmail implements ShouldQueue
     {
         $command = [
             'python3',
-            '/home/wanjohi/Code/web/phillips/email/index.py',
+            env('EMAIL_BASE_PATH').'/index.py',
             $this->email,
             $this->email_app_password,
             $this->interval
