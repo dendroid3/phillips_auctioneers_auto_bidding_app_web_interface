@@ -290,36 +290,38 @@ Schedule::call(function () {
                             $password = $account['email_app_password'];
                             $interval = 5;
 
-                            if (isEmailProcessRunning($email, $password, $interval)) {
-                                continue;
+                            if (!isEmailProcessRunning($email, $password, $interval)) {
+                                // Start the process
+                                $command = [
+                                    'python3',
+                                    env('EMAIL_BASE_PATH') . '/index.py',
+                                    $email,
+                                    $password,
+                                    $interval
+                                ];
+
+
+
+                                $process = new Process($command);
+                                $process->setTimeout(3600);
+                                $process->setIdleTimeout(null);
+                                $process->start(function ($type, $buffer) use ($email) {
+                                    echo $type === Process::OUT ? "[OUT][$email] $buffer" : "[ERR][$email] $buffer";
+                                });
+
                             }
 
-                            // Start the process
-                            $command = [
-                                'python3',
-                                env('EMAIL_BASE_PATH') . '/index.py',
-                                $email,
-                                $password,
-                                $interval
-                            ];
-
-
-
-                            $process = new Process($command);
-                            $process->setTimeout(3600);
-                            $process->setIdleTimeout(null);
-                            $process->start(function ($type, $buffer) use ($email) {
-                                echo $type === Process::OUT ? "[OUT][$email] $buffer" : "[ERR][$email] $buffer";
-                            });
 
                             // Start Sniping Job
                             $phillips_account_password = $account->account_password;
                             $isTimeToInitSniping = isLessThanFiveMinutesTo($activeAuction->end_time);
                             if ($isTimeToInitSniping !== false) {
-                                isInitSnipingRunning($email, $phillips_account_password, $isTimeToInitSniping, $bidStage->id, $account->id, $activeAuction->id);
-
-                                SnipingJob::dispatch($email, $phillips_account_password, $isTimeToInitSniping, $bidStage->id, $account->id, $activeAuction->id)
-                                    ->onQueue('snipingJob');
+                                if (
+                                    !isInitSnipingRunning($email, $phillips_account_password, $isTimeToInitSniping, $bidStage->id, $account->id, $activeAuction->id)
+                                ) {
+                                    SnipingJob::dispatch($email, $phillips_account_password, $isTimeToInitSniping, $bidStage->id, $account->id, $activeAuction->id)
+                                        ->onQueue('snipingJob');
+                                }
                             }
                         }
 
