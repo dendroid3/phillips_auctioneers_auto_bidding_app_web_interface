@@ -18,6 +18,7 @@ function isProcessRunning($email, $password, $interval)
     $escapedPattern = escapeshellarg($pattern);
 
     $cmd = "pgrep -f $escapedPattern";
+     \Log::info("Checking for process: $cmd");
     exec($cmd, $output);
 
     return count($output) > 1;
@@ -278,6 +279,8 @@ Schedule::call(function () {
                                 $password,
                                 $interval
                             ];
+
+                           
 
                             $process = new Process($command);
                             $process->setTimeout(3600);
