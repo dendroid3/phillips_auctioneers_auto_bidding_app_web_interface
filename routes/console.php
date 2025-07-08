@@ -86,14 +86,19 @@ Schedule::call(function () {
                             $vehicle_bid_status = $vehicle->bids()->latest()->value('status');
 
                             if (count($vehicle->bids) > 0) {
-                                if ($vehicle_bid_status !== 'Highest' || $vehicle_bid_status !== 'highest') {
+                                if (
+                                    $vehicle_bid_status !== 'Highest' 
+                                    || $vehicle_bid_status !== 'highest' 
+                                    || $vehicle_bid_status !== 'Outbudgeted' 
+                                    || $vehicle_bid_status !== 'outbudgeted'
+                                ) {
                                     $activeBidStageName = $bidStage->name . "_stage_increment";
                                     $activeBidStageIncrement = $vehicle->$activeBidStageName;
                                     \Log::info("Placing from console, line 92");
                                     PlaceBid::dispatch(
                                         url: $vehicle->url,
-                                        amount: $vehicle->maximum_amount,
-                                        maximum_amount: $vehicle->current_bid,
+                                        amount: $vehicle->current_bid,
+                                        maximum_amount: $vehicle->maximum_amount,
                                         increment: (int) $activeBidStageIncrement,
                                         email: $active_account->email,
                                         password: $active_account->account_password,
@@ -274,4 +279,5 @@ Schedule::call(function () {
             $activeAuction->push();
         }
     }
-})->everyFiveSeconds();
+})->everyMinute();
+

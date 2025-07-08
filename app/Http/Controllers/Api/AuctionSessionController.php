@@ -279,7 +279,7 @@ class AuctionSessionController extends Controller
             $phillips_account->push();
 
             \Log::info($request->all());
-            $auction_session = AuctionSession::find($request->account_session_id);
+            $auction_session = AuctionSession::find($request->auction_session_id);
             $auction_session->status = "unconfigurable";
             $auction_session->push();
             event(new NotificationFromInitAuctionTestEvent($id, $type, $title, $description));
