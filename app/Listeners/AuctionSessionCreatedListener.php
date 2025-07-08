@@ -16,11 +16,11 @@ class AuctionSessionCreatedListener
         ],
         [
             'start_time' => '12:45:01',
-            'end_time' => '12:55:00',
+            'end_time' => '12:53:00',
             'name' => 'aggressive',
         ],
         [
-            'start_time' => '12:55:01',
+            'start_time' => '12:53:01',
             'end_time' => '13:00:00',
             'name' => 'sniping',
         ]

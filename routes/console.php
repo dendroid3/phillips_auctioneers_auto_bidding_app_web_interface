@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Schedule;
 use Carbon\Carbon;
 use App\Models\PhillipsAccount;
 use App\Jobs\MonitorEmail;
+use App\Jobs\SnipingJob;
 use App\Events\NotificationFromInitAuctionTestEvent;
 
 use Symfony\Component\Process\Process;
@@ -21,6 +22,35 @@ function isProcessRunning($email, $password, $interval)
 
     return count($output) > 1;
 }
+
+function isLessThanFiveMinutesTo($targetTime)
+{
+    $now = new DateTime();
+    $target = DateTime::createFromFormat('H:i:s', $targetTime);
+
+    // Build full datetime using today's date
+    $fullTarget = (clone $now)->setTime(
+        (int) $target->format('H'),
+        (int) $target->format('i'),
+        (int) $target->format('s')
+    );
+
+    // If target is in the past, assume it's for tomorrow
+    if ($fullTarget < $now) {
+        $fullTarget->modify('+1 day');
+    }
+
+    $interval = $fullTarget->getTimestamp() - $now->getTimestamp();
+
+    if ($interval <= 30000 && $interval >= 0) {
+        // Subtract 2 minutes (120 seconds)
+        $adjusted = (clone $fullTarget)->modify('-2 minutes');
+        return $adjusted->format('H:i:s');
+    }
+
+    return false;
+}
+
 
 // Check if the email monitor is still making heartbeats, if not restart the job
 Schedule::call(function () {
@@ -50,7 +80,6 @@ Schedule::call(function () {
         ->whereTime('start_time', '<=', $currentTime)
         ->whereTime('end_time', '>=', $currentTime)
         ->first();
-
 
     if ($activeAuction) {
         if (Carbon::now()->format('H:i:s') > $activeAuction->start_time && Carbon::now()->format('H:i:s') < $activeAuction->end_time) {
@@ -151,7 +180,7 @@ Schedule::call(function () {
                                     $activeBidStageName = $bidStage->name . "_stage_increment";
                                     $activeBidStageIncrement = $vehicle->$activeBidStageName;
 
-                                    \Log::info("Placing from console, line 149");
+                                    // \Log::info("Placing from console, line 149");
                                     // PlaceBid::dispatch(
                                     //     url: $vehicle->url,
                                     //     amount: $vehicle->maximum_amount,
@@ -195,7 +224,7 @@ Schedule::call(function () {
                                     $vehicle_bid_status !== 'highest'
                                 ) {
 
-                                    \Log::info("Placing from console, line 193");
+                                    // \Log::info("Placing from console, line 193");
                                     // PlaceBid::dispatch(
                                     //     url: $vehicle->url,
                                     //     amount: $vehicle->current_bid,
@@ -225,13 +254,12 @@ Schedule::call(function () {
                                 $vehicle->status !== 'Unconfigurable' &&
                                 $vehicle->status !== 'unconfigurable'
                             ) {
-                                \Log::info("Line 223");
                                 $vehicle->status = 'sniping';
                                 $vehicle->push();
                             }
                         }
 
-                        // Monitor emails more aggressively
+                        // Monitor emails more aggressively and Init Sniping
                         foreach ($active_accounts as $account) {
                             $email = $account['email'];
                             $password = $account['email_app_password'];
@@ -244,7 +272,7 @@ Schedule::call(function () {
                             // Start the process
                             $command = [
                                 'python3',
-                                env('EMAIL_BASE_PATH').'/index.py',
+                                env('EMAIL_BASE_PATH') . '/index.py',
                                 $email,
                                 $password,
                                 $interval
@@ -257,8 +285,16 @@ Schedule::call(function () {
                                 echo $type === Process::OUT ? "[OUT][$email] $buffer" : "[ERR][$email] $buffer";
                             });
 
-                            // call sniping script
+                            // Start Sniping Job
+                            $phillips_account_password = $account -> account_password;
+                            $itIsTimeToInitSniping = isLessThanFiveMinutesTo($activeAuction->end_time);
+                            if ($itIsTimeToInitSniping !== false) {
+                                SnipingJob::dispatch($email, $phillips_account_password, $itIsTimeToInitSniping, $bidStage->id, $account->id, $activeAuction->id)
+                                    ->onQueue('snipingJob');
+                            }
                         }
+
+
 
                     }
                 } else {
