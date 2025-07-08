@@ -31,8 +31,8 @@ class SnipingJob implements ShouldQueue
 
         $id = \Str::random(10);
         $type = 'amber';
-        $title = 'SNIPING TRIGGER TIME';
-        $description = 'The trigger will be pulled at, ' . $this->trigger_time . '. Fingers crossed.';
+        $title = 'SNIPING TRIGGER TIME: ' . $this->trigger_time;
+        $description = 'The actual sniping has began for account ' . $this->email . '. trigger will be pulled at, ' . $this->trigger_time . '. Fingers crossed.';
 
         NotificationFromInitAuctionTestEvent::dispatch($id, $type, $title, $description);
 
@@ -53,21 +53,44 @@ class SnipingJob implements ShouldQueue
             $this->auction_session_id
         ];
 
-        \Log::info($command);
-        $process = new Process($command);
+        // \Log::info($command);
+        // $process = new Process($command);
 
-        $process->setTimeout(3600); // 1 hour timeout
+        // $process->setTimeout(3600); // 1 hour timeout
+        // $process->setIdleTimeout(1800);
+
+        // try {
+        //     $process->run();
+
+        //     if (!$process->isSuccessful()) {
+        //         throw new \RuntimeException($process->getErrorOutput());
+        //     }
+
+        // } catch (\Exception $e) {
+        //     throw $e; // This will trigger the job's failed() method
+        // }
+
+        \Log::info('Starting Node script with command: ' . implode(' ', $command));
+
+        $process = new Process($command);
+        $process->setTimeout(3600);
         $process->setIdleTimeout(1800);
 
-        try {
-            $process->run();
-
-            if (!$process->isSuccessful()) {
-                throw new \RuntimeException($process->getErrorOutput());
+        // Stream both stdout and stderr to laravel.log
+        $process->run(function ($type, $buffer) {
+            if (Process::ERR === $type) {
+                \Log::error('[Node STDERR] ' . trim($buffer));
+            } else {
+                \Log::info('[Node STDOUT] ' . trim($buffer));
             }
+        });
 
-        } catch (\Exception $e) {
-            throw $e; // This will trigger the job's failed() method
+        // Optionally handle non-zero exit code
+        if (!$process->isSuccessful()) {
+            throw new ProcessFailedException($process);
         }
+
+        \Log::info('Node script completed successfully.');
+
     }
 }
