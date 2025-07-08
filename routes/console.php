@@ -290,8 +290,8 @@ Schedule::call(function () {
                             $phillips_account_password = $account->account_password;
                             $isTimeToInitSniping = isLessThanFiveMinutesTo($activeAuction->end_time);
                             if ($isTimeToInitSniping !== false) {
-                                \Log::info("it is time");
-                                \Log::info("Email is " . $email);
+                                // \Log::info("it is time");
+                                // \Log::info("Email is " . $email);
                                 SnipingJob::dispatch($email, $phillips_account_password, $isTimeToInitSniping, $bidStage->id, $account->id, $activeAuction->id)
                                     ->onQueue('snipingJob');
                             }
