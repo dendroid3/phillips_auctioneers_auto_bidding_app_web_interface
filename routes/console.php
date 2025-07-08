@@ -26,18 +26,18 @@ function isEmailProcessRunning($email, $password, $interval)
 function isInitSnipingRunning($email, $password, $trigger_time, $bid_stage_id, $phillips_account_id, $auction_session_id)
 {
     $pattern = 'node ' .
-        env('BOT_BASE_PATH') . '/initSniping.js' .
-        '--email' .
+        env('BOT_BASE_PATH') . '/initSniping.js ' .
+        '--email ' .
         $email .
-        '--password' .
+        ' --password ' .
         $password .
-        '--trigger_time' .
+        ' --trigger_time ' .
         $trigger_time .
-        '--bid_stage_id' .
+        ' --bid_stage_id ' .
         $bid_stage_id .
-        '--phillips_account_id' .
+        ' --phillips_account_id ' .
         $phillips_account_id .
-        '--auction_session_id' .
+        ' --auction_session_id ' .
         $auction_session_id;
     $escapedPattern = escapeshellarg($pattern);
 
