@@ -85,46 +85,46 @@ Schedule::call(function () {
 
                             $vehicle_bid_status = $vehicle->bids()->latest()->value('status');
 
-                            if (count($vehicle->bids) > 0) {
-                                if (
-                                    $vehicle_bid_status !== 'Highest' 
-                                    || $vehicle_bid_status !== 'highest' 
-                                    || $vehicle_bid_status !== 'Outbudgeted' 
-                                    || $vehicle_bid_status !== 'outbudgeted'
-                                ) {
-                                    $activeBidStageName = $bidStage->name . "_stage_increment";
-                                    $activeBidStageIncrement = $vehicle->$activeBidStageName;
-                                    \Log::info("Placing from console, line 92");
-                                    PlaceBid::dispatch(
-                                        url: $vehicle->url,
-                                        amount: $vehicle->current_bid,
-                                        maximum_amount: $vehicle->maximum_amount,
-                                        increment: (int) $activeBidStageIncrement,
-                                        email: $active_account->email,
-                                        password: $active_account->account_password,
-                                        vehicle_id: $vehicle->id,
-                                        vehicle_name: $vehicle->phillips_vehicle_id,
-                                        bid_stage_name: $bidStage->name,
-                                        bid_stage_id: $bidStage->id
-                                    )->onQueue('placeBids');
-                                }
-                            } else {
-                                $activeBidStageName = $bidStage->name . "_stage_increment";
-                                $activeBidStageIncrement = $vehicle->$activeBidStageName;
-                                \Log::info("Placing from console, line 109");
-                                PlaceBid::dispatch(
-                                    url: $vehicle->url,
-                                    amount: $vehicle->maximum_amount,
-                                    maximum_amount: $vehicle->start_amount,
-                                    increment: (int) $activeBidStageIncrement,
-                                    email: $active_account->email,
-                                    password: $active_account->account_password,
-                                    vehicle_id: $vehicle->id,
-                                    vehicle_name: $vehicle->phillips_vehicle_id,
-                                    bid_stage_name: $bidStage->name,
-                                    bid_stage_id: $bidStage->id
-                                )->onQueue('placeBids');
-                            }
+                            // if (count($vehicle->bids) > 0) {
+                            //     if (
+                            //         $vehicle_bid_status !== 'Highest' 
+                            //         || $vehicle_bid_status !== 'highest' 
+                            //         || $vehicle_bid_status !== 'Outbudgeted' 
+                            //         || $vehicle_bid_status !== 'outbudgeted'
+                            //     ) {
+                            //         $activeBidStageName = $bidStage->name . "_stage_increment";
+                            //         $activeBidStageIncrement = $vehicle->$activeBidStageName;
+                            //         \Log::info("Placing from console, line 92");
+                            //         PlaceBid::dispatch(
+                            //             url: $vehicle->url,
+                            //             amount: $vehicle->current_bid,
+                            //             maximum_amount: $vehicle->maximum_amount,
+                            //             increment: (int) $activeBidStageIncrement,
+                            //             email: $active_account->email,
+                            //             password: $active_account->account_password,
+                            //             vehicle_id: $vehicle->id,
+                            //             vehicle_name: $vehicle->phillips_vehicle_id,
+                            //             bid_stage_name: $bidStage->name,
+                            //             bid_stage_id: $bidStage->id
+                            //         )->onQueue('placeBids');
+                            //     }
+                            // } else {
+                            //     $activeBidStageName = $bidStage->name . "_stage_increment";
+                            //     $activeBidStageIncrement = $vehicle->$activeBidStageName;
+                            //     \Log::info("Placing from console, line 109");
+                            //     PlaceBid::dispatch(
+                            //         url: $vehicle->url,
+                            //         amount: $vehicle->maximum_amount,
+                            //         maximum_amount: $vehicle->start_amount,
+                            //         increment: (int) $activeBidStageIncrement,
+                            //         email: $active_account->email,
+                            //         password: $active_account->account_password,
+                            //         vehicle_id: $vehicle->id,
+                            //         vehicle_name: $vehicle->phillips_vehicle_id,
+                            //         bid_stage_name: $bidStage->name,
+                            //         bid_stage_id: $bidStage->id
+                            //     )->onQueue('placeBids');
+                            // }
 
                         }
                     } else if ($bidStage->name == 'aggressive') {
