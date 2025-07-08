@@ -205,7 +205,7 @@ Schedule::call(function () {
                             $type = 'amber';
                             $title = 'SNIPING STAGE INITIATED';
                             $description = "We have moved to the sniping stage now. We will monitor the emails more aggressively (5 seconds), " .
-                                "open tabs for each of the active vehicles when there is 5 minutes lesft in the auction, then wait for the last 3 to start placing the bids.";
+                                "open tabs for each of the active vehicles when there is 5 minutes left in the auction, then wait for the last 3 to start placing the bids.";
                             NotificationFromInitAuctionTestEvent::dispatch($id, $type, $title, $description);
                         }
 
