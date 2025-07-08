@@ -12,13 +12,36 @@ use App\Events\NotificationFromInitAuctionTestEvent;
 
 use Symfony\Component\Process\Process;
 
-function isProcessRunning($email, $password, $interval)
+function isEmailProcessRunning($email, $password, $interval)
 {
     $pattern = "python3 " . env('EMAIL_BASE_PATH') . "/index.py $email $password $interval";
     $escapedPattern = escapeshellarg($pattern);
 
     $cmd = "pgrep -f $escapedPattern";
-     \Log::info("Checking for process: $cmd");
+    exec($cmd, $output);
+
+    return count($output) > 1;
+}
+
+function isInitSnipingRunning($email, $password, $trigger_time, $bid_stage_id, $phillips_account_id, $auction_session_id)
+{
+    $pattern = 'node ' .
+        env('BOT_BASE_PATH') . '/initSniping.js' .
+        '--email' .
+        $email .
+        '--password' .
+        $password .
+        '--trigger_time' .
+        $trigger_time .
+        '--bid_stage_id' .
+        $bid_stage_id .
+        '--phillips_account_id' .
+        $phillips_account_id .
+        '--auction_session_id' .
+        $auction_session_id;
+    $escapedPattern = escapeshellarg($pattern);
+
+    $cmd = "pgrep -f $escapedPattern";
     exec($cmd, $output);
 
     return count($output) > 1;
@@ -84,7 +107,7 @@ Schedule::call(function () {
 
     if ($activeAuction) {
         if (Carbon::now()->format('H:i:s') > $activeAuction->start_time && Carbon::now()->format('H:i:s') < $activeAuction->end_time) {
-            if ($activeAuction->status == 'configured' || $activeAuction -> status == 'elapsed') {
+            if ($activeAuction->status == 'configured' || $activeAuction->status == 'elapsed') {
                 $activeAuction->status = "active";
                 $activeAuction->push();
             }
@@ -267,7 +290,7 @@ Schedule::call(function () {
                             $password = $account['email_app_password'];
                             $interval = 5;
 
-                            if (isProcessRunning($email, $password, $interval)) {
+                            if (isEmailProcessRunning($email, $password, $interval)) {
                                 continue;
                             }
 
@@ -280,7 +303,7 @@ Schedule::call(function () {
                                 $interval
                             ];
 
-                           
+
 
                             $process = new Process($command);
                             $process->setTimeout(3600);
@@ -293,8 +316,8 @@ Schedule::call(function () {
                             $phillips_account_password = $account->account_password;
                             $isTimeToInitSniping = isLessThanFiveMinutesTo($activeAuction->end_time);
                             if ($isTimeToInitSniping !== false) {
-                                // \Log::info("it is time");
-                                // \Log::info("Email is " . $email);
+                                isInitSnipingRunning($email, $phillips_account_password, $isTimeToInitSniping, $bidStage->id, $account->id, $activeAuction->id);
+
                                 SnipingJob::dispatch($email, $phillips_account_password, $isTimeToInitSniping, $bidStage->id, $account->id, $activeAuction->id)
                                     ->onQueue('snipingJob');
                             }
