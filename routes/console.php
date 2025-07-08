@@ -83,7 +83,7 @@ Schedule::call(function () {
 
     if ($activeAuction) {
         if (Carbon::now()->format('H:i:s') > $activeAuction->start_time && Carbon::now()->format('H:i:s') < $activeAuction->end_time) {
-            if ($activeAuction->status == 'configured') {
+            if ($activeAuction->status == 'configured' || $activeAuction -> status == 'elapsed') {
                 $activeAuction->status = "active";
                 $activeAuction->push();
             }
@@ -288,11 +288,11 @@ Schedule::call(function () {
 
                             // Start Sniping Job
                             $phillips_account_password = $account->account_password;
-                            $itIsTimeToInitSniping = isLessThanFiveMinutesTo($activeAuction->end_time);
-                            if ($itIsTimeToInitSniping !== false) {
+                            $isTimeToInitSniping = isLessThanFiveMinutesTo($activeAuction->end_time);
+                            if ($isTimeToInitSniping !== false) {
                                 \Log::info("it is time");
                                 \Log::info("Email is " . $email);
-                                SnipingJob::dispatch($email, $phillips_account_password, $itIsTimeToInitSniping, $bidStage->id, $account->id, $activeAuction->id)
+                                SnipingJob::dispatch($email, $phillips_account_password, $isTimeToInitSniping, $bidStage->id, $account->id, $activeAuction->id)
                                     ->onQueue('snipingJob');
                             }
                         }
