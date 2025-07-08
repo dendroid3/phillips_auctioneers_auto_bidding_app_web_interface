@@ -16,7 +16,7 @@ class SnipingJob implements ShouldQueue
     protected $email, $password, $trigger_time, $bid_stage_id, $phillips_account_id, $auction_session_id;
     public function __construct($email, $password, $trigger_time, $bid_stage_id, $phillips_account_id, $auction_session_id)
     {
-        $this->$email = $email;
+        $this->email = $email;
         $this->password = $password;
         $this->trigger_time = $trigger_time;
         $this->bid_stage_id = $bid_stage_id;
