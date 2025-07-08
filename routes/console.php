@@ -42,7 +42,7 @@ function isLessThanFiveMinutesTo($targetTime)
 
     $interval = $fullTarget->getTimestamp() - $now->getTimestamp();
 
-    if ($interval <= 30000 && $interval >= 0) {
+    if ($interval <= 300 && $interval >= 0) {
         // Subtract 2 minutes (120 seconds)
         $adjusted = (clone $fullTarget)->modify('-2 minutes');
         return $adjusted->format('H:i:s');
