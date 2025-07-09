@@ -304,19 +304,19 @@ Schedule::call(function () {
                             $phillips_account_password = $account->account_password;
 
                             if ($bidStage->status !== 'active') {
-                                $isTimeToInitSniping = triggerTime($activeAuction->end_time);
-                                SnipingJob::dispatch($email, $phillips_account_password, $isTimeToInitSniping, $bidStage->id, $account->id, $activeAuction->id)
-                                    ->onQueue('snipingJob');
-
-                                $bidStage->status = "active";
-                                $bidStage->push();
-
                                 $id = Str::random(10);
                                 $type = 'amber';
                                 $title = 'SNIPING STAGE INITIATED';
                                 $description = "We have moved to the sniping stage now. We will monitor the emails more aggressively (5 seconds), " .
                                     "open tabs for each of the active vehicles when there is 5 minutes left in the auction, then wait for the last 3 to start placing the bids.";
                                 NotificationFromInitAuctionTestEvent::dispatch($id, $type, $title, $description);
+
+                                $isTimeToInitSniping = triggerTime($activeAuction->end_time);
+                                SnipingJob::dispatch($email, $phillips_account_password, $isTimeToInitSniping, $bidStage->id, $account->id, $activeAuction->id)
+                                    ->onQueue('snipingJob');
+
+                                $bidStage->status = "active";
+                                $bidStage->push();
                             }
 
                         }
