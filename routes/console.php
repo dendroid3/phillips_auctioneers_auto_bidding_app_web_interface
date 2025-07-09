@@ -312,8 +312,8 @@ Schedule::call(function () {
                                 NotificationFromInitAuctionTestEvent::dispatch($id, $type, $title, $description);
 
                                 $isTimeToInitSniping = triggerTime($activeAuction->end_time);
-                                SnipingJob::dispatch($email, $phillips_account_password, $isTimeToInitSniping, $bidStage->id, $account->id, $activeAuction->id)
-                                    ->onQueue('snipingJob');
+                                // SnipingJob::dispatch($email, $phillips_account_password, $isTimeToInitSniping, $bidStage->id, $account->id, $activeAuction->id)
+                                //     ->onQueue('snipingJob');
 
                                 $bidStage->status = "active";
                                 $bidStage->push();
