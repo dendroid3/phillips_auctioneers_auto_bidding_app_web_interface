@@ -41,7 +41,7 @@ function isInitSnipingRunning($email, $password, $trigger_time, $bid_stage_id, $
         $auction_session_id;
     $escapedPattern = escapeshellarg($pattern);
 
-    // \Log::info("looking for command " . $escapedPattern);
+    \Log::info("looking for command " . $escapedPattern);
 
     $cmd = "pgrep -f $escapedPattern";
     exec($cmd, $output);
