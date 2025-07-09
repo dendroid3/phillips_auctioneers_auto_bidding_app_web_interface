@@ -23,32 +23,79 @@ function isEmailProcessRunning($email, $password, $interval)
     return count($output) > 1;
 }
 
+
+
+// function isInitSnipingRunning($email, $password, $trigger_time, $bid_stage_id, $phillips_account_id, $auction_session_id)
+// {
+//     $pattern =
+//         'node ' .
+//         env('BOT_BASE_PATH') . '/initSniping.js' .
+//         ' --email ' .
+//         $email .
+//         ' --password ' .
+//         $password .
+//         ' --trigger_time ' .
+//         $trigger_time .
+//         ' --bid_stage_id ' .
+//         $bid_stage_id .
+//         ' --phillips_account_id ' .
+//         $phillips_account_id .
+//         ' --auction_session_id ' .
+//         $auction_session_id;
+
+//     $escapedPattern = escapeshellarg($pattern);
+//     $cmd = "pgrep -f $escapedPattern";
+//     exec($cmd, $output);
+
+//     \Log::info("Checking if initSniping is running: $pattern | Matches found: " . count($output));
+//     return count($output) > 0;
+// }
+
 function isInitSnipingRunning($email, $password, $trigger_time, $bid_stage_id, $phillips_account_id, $auction_session_id)
 {
-    $pattern =
-        'node ' .
-        env('BOT_BASE_PATH') . '/initSniping.js' .
-        ' --email ' .
-        $email .
-        ' --password ' .
-        $password .
-        ' --trigger_time ' .
-        $trigger_time .
-        ' --bid_stage_id ' .
-        $bid_stage_id .
-        ' --phillips_account_id ' .
-        $phillips_account_id .
-        ' --auction_session_id ' .
-        $auction_session_id;
+    // Build pattern parts with proper escaping
+    $patternParts = [
+        '^node',                          // Start with node (^ for exact match)
+        env('BOT_BASE_PATH') . '/initSniping.js',
+        '--email',
+        escapeshellarg($email),
+        '--password',
+        escapeshellarg($password),        // Critical for special chars like #
+        '--trigger_time',
+        escapeshellarg($trigger_time),
+        '--bid_stage_id',
+        escapeshellarg($bid_stage_id),
+        '--phillips_account_id',
+        escapeshellarg($phillips_account_id),
+        '--auction_session_id',
+        escapeshellarg($auction_session_id),
+        '$'                               // End of pattern ($ for exact match)
+    ];
 
-    $escapedPattern = escapeshellarg($pattern);
-    $cmd = "pgrep -f $escapedPattern";
-    exec($cmd, $output);
+    $pattern = implode(' ', $patternParts);
+    $cmd = "pgrep -a -f " . escapeshellarg($pattern);
 
-    \Log::info("Checking if initSniping is running: $pattern | Matches found: " . count($output));
-    return count($output) > 0;
+    // Debug logging
+    \Log::info("Checking process with command: " . $cmd);
+    exec($cmd, $output, $returnCode);
+
+    // Additional verification if matches found
+    if (count($output) > 0) {
+        $pid = explode(" ", $output[0])[0];
+        exec("ps -p $pid -o etime=,cmd=", $processInfo);
+        
+        \Log::info("Process match details:", [
+            'pid' => $pid,
+            'uptime' => $processInfo[0] ?? 'N/A',
+            'command' => $processInfo[1] ?? 'N/A'
+        ]);
+
+        // Only return true if process still exists
+        return !empty($processInfo);
+    }
+
+    return false;
 }
-
 
 
 function isLessThanFiveMinutesTo($targetTime)
