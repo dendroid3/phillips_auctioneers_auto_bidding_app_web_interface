@@ -46,7 +46,7 @@ function isInitSnipingRunning($email, $password, $trigger_time, $bid_stage_id, $
     exec($cmd, $output);
 
     \Log::info("Checking if initSniping is running: $pattern | Matches found: " . count($output));
-    return count($output) > 1;
+    return count($output) > 0;
 }
 
 
