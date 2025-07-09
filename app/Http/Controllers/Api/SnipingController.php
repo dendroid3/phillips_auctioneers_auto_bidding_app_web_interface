@@ -10,8 +10,8 @@ class SnipingController extends Controller
 {
     public function init(Request $request)
     {
-        \Log::info("line 13");
-        \Log::info($request->all());
+        // \Log::info("line 13");
+        // \Log::info($request->all());
         $vehicles = Vehicle::query()->where(
             [
                 'auction_session_id' => (int) $request->auction_session_id,
@@ -19,8 +19,8 @@ class SnipingController extends Controller
                 'status' => 'sniping'
             ]
         )->get();
-        \Log::info($vehicles);
-        \Log::info("line 23");
+        // \Log::info($vehicles);
+        // \Log::info("line 23");
 // $vehicles = Vehicle::query()->where(
 //             [
 //                 'auction_session_id' => 1,

@@ -232,7 +232,7 @@ class AuctionSessionController extends Controller
          * ------- Front end to alert this so as to suspend all other activity till it is read
          */
         // type, id, title, description
-        \Log::info($request->all());
+        // \Log::info($request->all());
         if ($request->status == 200) {
             $id = Str::random(10) . "-" . $request->email;
             $type = "success";
@@ -278,7 +278,7 @@ class AuctionSessionController extends Controller
             $phillips_account->account_status = "failed";
             $phillips_account->push();
 
-            \Log::info($request->all());
+            // \Log::info($request->all());
             $auction_session = AuctionSession::find($request->auction_session_id);
             $auction_session->status = "unconfigurable";
             $auction_session->push();
@@ -397,12 +397,12 @@ class AuctionSessionController extends Controller
             $vehicle->push();
         }
 
-        \Log::info("lastBidAmount " . $lastBidAmount . "request -> current_bid: " . $request->current_bid . "vehicle -> current_bid: " . $vehicle->current_bid);
+        // \Log::info("lastBidAmount " . $lastBidAmount . "request -> current_bid: " . $request->current_bid . "vehicle -> current_bid: " . $vehicle->current_bid);
         if (
             (int) $lastBidAmount !== (int) $request->current_bid &&
             (int) $vehicle->current_bid !== (int) $request->current_bid
         ) {
-            \Log::info("We inside here 407");
+            // \Log::info("We inside here 407");
             $bid = new Bid;
             $bid->vehicle_id = $vehicle->id;
             $bid->phillips_account_id = PhillipsAccount::query()->where('email', 'competitor@example.com')->first()->id;
@@ -445,7 +445,7 @@ class AuctionSessionController extends Controller
 
     public function scrape(Request $request)
     {
-        \Log::info("scrapping vehicles");
+        // \Log::info("scrapping vehicles");
         ScrapeAuctions::Dispatch();
 
         return response()->json([

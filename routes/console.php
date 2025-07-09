@@ -23,30 +23,81 @@ function isEmailProcessRunning($email, $password, $interval)
     return count($output) > 1;
 }
 
+// function isInitSnipingRunning($email, $password, $trigger_time, $bid_stage_id, $phillips_account_id, $auction_session_id)
+// {
+//     $pattern = 'node ' .
+//         env('BOT_BASE_PATH') . '/initSniping.js ' .
+//         '--email ' .
+//         $email .
+//         ' --password ' .
+//         $password .
+//         ' --trigger_time ' .
+//         $trigger_time .
+//         ' --bid_stage_id ' .
+//         $bid_stage_id .
+//         ' --phillips_account_id ' .
+//         $phillips_account_id .
+//         ' --auction_session_id ' .
+//         $auction_session_id;
+//     $escapedPattern = escapeshellarg($pattern);
+
+//     \Log::info("looking for command " . $escapedPattern);
+
+//     $cmd = "pgrep -f $escapedPattern";
+//     exec($cmd, $output);
+
+//     return count($output) > 1;
+// }
+
 function isInitSnipingRunning($email, $password, $trigger_time, $bid_stage_id, $phillips_account_id, $auction_session_id)
 {
-    $pattern = 'node ' .
-        env('BOT_BASE_PATH') . '/initSniping.js ' .
-        '--email ' .
-        $email .
-        ' --password ' .
-        $password .
-        ' --trigger_time ' .
-        $trigger_time .
-        ' --bid_stage_id ' .
-        $bid_stage_id .
-        ' --phillips_account_id ' .
-        $phillips_account_id .
-        ' --auction_session_id ' .
-        $auction_session_id;
-    $escapedPattern = escapeshellarg($pattern);
+    // $search = implode(' ', [
+    //     'node',
+    //     env('BOT_BASE_PATH') . '/initSniping.js',
+    //     '--email',
+    //     $email,
+    //     '--password',
+    //     $password,
+    //     '--trigger_time',
+    //     $trigger_time,
+    //     '--bid_stage_id',
+    //     $bid_stage_id,
+    //     '--phillips_account_id',
+    //     $phillips_account_id,
+    //     '--auction_session_id',
+    //     $auction_session_id
+    // ]);
 
-    \Log::info("looking for command " . $escapedPattern);
+    // \Log::info("Looking for command: $search");
 
-    $cmd = "pgrep -f $escapedPattern";
+    // $cmd = "ps aux | grep " . escapeshellarg($search) . " | grep -v grep";
+    // exec($cmd, $output);
+
+    // return count($output) > 0;
+
+    $search = implode(' ', [
+        'node',
+        env('BOT_BASE_PATH') . '/initSniping.js',
+        '--email',
+        $email,
+        '--password',
+        $password,
+        '--trigger_time',
+        $trigger_time,
+        '--bid_stage_id',
+        $bid_stage_id,
+        '--phillips_account_id',
+        $phillips_account_id,
+        '--auction_session_id',
+        $auction_session_id
+    ]);
+
+    \Log::info("Looking for command: $search");
+
+    $cmd = "ps aux | grep " . escapeshellarg($search) . " | grep -v grep";
     exec($cmd, $output);
 
-    return count($output) > 1;
+    return count($output) > 0;
 }
 
 function isLessThanFiveMinutesTo($targetTime)
