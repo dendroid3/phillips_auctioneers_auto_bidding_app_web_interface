@@ -23,68 +23,33 @@ function isEmailProcessRunning($email, $password, $interval)
     return count($output) > 1;
 }
 
-// function isInitSnipingRunning($email, $password, $trigger_time, $bid_stage_id, $phillips_account_id, $auction_session_id)
-// {
-//     $pattern = 'node ' .
-//         env('BOT_BASE_PATH') . '/initSniping.js ' .
-//         '--email ' .
-//         $email .
-//         ' --password ' .
-//         $password .
-//         ' --trigger_time ' .
-//         $trigger_time .
-//         ' --bid_stage_id ' .
-//         $bid_stage_id .
-//         ' --phillips_account_id ' .
-//         $phillips_account_id .
-//         ' --auction_session_id ' .
-//         $auction_session_id;
-//     $escapedPattern = escapeshellarg($pattern);
-
-//     \Log::info("looking for command " . $escapedPattern);
-
-//     $cmd = "pgrep -f $escapedPattern";
-//     exec($cmd, $output);
-
-//     return count($output) > 1;
-// }
-
-// function isInitSnipingRunning($email, $password, $trigger_time, $bid_stage_id, $phillips_account_id, $auction_session_id)
-// {    $search = implode(' ', [
-//         'node',
-//         env('BOT_BASE_PATH') . '/initSniping.js',
-//         '--email',
-//         $email,
-//         '--password',
-//         $password,
-//         '--trigger_time',
-//         $trigger_time,
-//         '--bid_stage_id',
-//         $bid_stage_id,
-//         '--phillips_account_id',
-//         $phillips_account_id,
-//         '--auction_session_id',
-//         $auction_session_id
-//     ]);
-
-//     \Log::info("Looking for command: $search");
-
-//     $cmd = "ps aux | grep " . escapeshellarg($search) . " | grep -v grep";
-//     exec($cmd, $output);
-
-//     return count($output) > 0;
-// }
-
-function isInitSnipingRunning($email, $trigger_time)
+function isInitSnipingRunning($email, $trigger_time, $bid_stage_id, $phillips_account_id, $auction_session_id)
 {
-    $cmd = "ps aux | grep node | grep initSniping.js | grep " . escapeshellarg($email) . " | grep " . escapeshellarg($trigger_time) . " | grep -v grep";
+    $patternParts = [
+        'node',
+        env('BOT_BASE_PATH') . '/initSniping.js',
+        '--email',
+        $email,
+        '--trigger_time',
+        $trigger_time,
+        '--bid_stage_id',
+        $bid_stage_id,
+        '--phillips_account_id',
+        $phillips_account_id,
+        '--auction_session_id',
+        $auction_session_id
+    ];
 
+    // Join without the password
+    $pattern = implode(' ', $patternParts);
+    $cmd = "pgrep -a -f " . escapeshellarg($pattern);
     exec($cmd, $output);
 
-    \Log::info("isInitSnipingRunning() found " . count($output) . " processes for $email at $trigger_time");
+    \Log::info("Checking if initSniping is running: $pattern | Matches found: " . count($output));
 
     return count($output) > 0;
 }
+
 
 
 function isLessThanFiveMinutesTo($targetTime)
@@ -357,9 +322,10 @@ Schedule::call(function () {
                             $isTimeToInitSniping = isLessThanFiveMinutesTo($activeAuction->end_time);
                             if ($isTimeToInitSniping !== false) {
                                 if (
-                                    !isInitSnipingRunning($email, $phillips_account_password, $isTimeToInitSniping, $bidStage->id, $account->id, $activeAuction->id)
+                                    !isInitSnipingRunning($email, $isTimeToInitSniping, $bidStage->id, $account->id, $activeAuction->id)
                                 ) {
-                                    SnipingJob::dispatch($email, $phillips_account_password, $isTimeToInitSniping, $bidStage->id, $account->id, $activeAuction->id)
+                                    \Log::info("is inside here");
+                                    SnipingJob::dispatch($email, $isTimeToInitSniping, $bidStage->id, $account->id, $activeAuction->id)
                                         ->onQueue('snipingJob');
                                 }
                             }
