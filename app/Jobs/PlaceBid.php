@@ -53,6 +53,7 @@ class PlaceBid implements ShouldQueue
     {
         $vehicle_name = Vehicle::find($this->vehicle_id)->phillips_vehicle_id;
 
+        \Log::info($this->url);
         $formatter = new \NumberFormatter('en_KE', \NumberFormatter::CURRENCY);
         $formatter->setAttribute(\NumberFormatter::FRACTION_DIGITS, 0);
         $formatted_bid_amount = $formatter->formatCurrency($this->amount, 'KES');
