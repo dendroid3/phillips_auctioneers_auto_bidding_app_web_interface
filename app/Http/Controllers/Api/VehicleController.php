@@ -120,7 +120,7 @@ class VehicleController extends Controller
             $vehicle->push();
 
             $last_vehicle_id = $vehicle->id;
-            $last_vehicle_url = "http://phillips.adilirealestate.com/bidSuccess.html";
+            $last_vehicle_url = $vehicle->url; //"http://phillips.adilirealestate.com/bidSuccess.html";
         }
         return response()->json([
             'last_vehicle_id' => $last_vehicle_id,

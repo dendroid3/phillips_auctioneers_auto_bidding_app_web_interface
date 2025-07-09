@@ -46,7 +46,7 @@ class SnipingController extends Controller
         )->get();
 
         foreach ($vehicles as $vehicle) {
-            $vehicle->url = "http://phillips.adilirealestate.com/bidSuccess.html";
+            // $vehicle->url = "http://phillips.adilirealestate.com/bidSuccess.html";
         }
 
         return response()->json($vehicles);
