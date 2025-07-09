@@ -51,54 +51,8 @@ function isEmailProcessRunning($email, $password, $interval)
 //     return count($output) > 0;
 // }
 
-function isInitSnipingRunning($email, $password, $trigger_time, $bid_stage_id, $phillips_account_id, $auction_session_id)
-{
-    // Build pattern parts with proper escaping
-    $patternParts = [
-        '^node',                          // Start with node (^ for exact match)
-        env('BOT_BASE_PATH') . '/initSniping.js',
-        '--email',
-        escapeshellarg($email),
-        '--password',
-        escapeshellarg($password),        // Critical for special chars like #
-        '--trigger_time',
-        escapeshellarg($trigger_time),
-        '--bid_stage_id',
-        escapeshellarg($bid_stage_id),
-        '--phillips_account_id',
-        escapeshellarg($phillips_account_id),
-        '--auction_session_id',
-        escapeshellarg($auction_session_id),
-        '$'                               // End of pattern ($ for exact match)
-    ];
 
-    $pattern = implode(' ', $patternParts);
-    $cmd = "pgrep -a -f " . escapeshellarg($pattern);
-
-    // Debug logging
-    \Log::info("Checking process with command: " . $cmd);
-    exec($cmd, $output, $returnCode);
-
-    // Additional verification if matches found
-    if (count($output) > 0) {
-        $pid = explode(" ", $output[0])[0];
-        exec("ps -p $pid -o etime=,cmd=", $processInfo);
-        
-        \Log::info("Process match details:", [
-            'pid' => $pid,
-            'uptime' => $processInfo[0] ?? 'N/A',
-            'command' => $processInfo[1] ?? 'N/A'
-        ]);
-
-        // Only return true if process still exists
-        return !empty($processInfo);
-    }
-
-    return false;
-}
-
-
-function isLessThanFiveMinutesTo($targetTime)
+function triggerTime($targetTime)
 {
     $now = new DateTime();
     $target = DateTime::createFromFormat('H:i:s', $targetTime);
@@ -117,13 +71,9 @@ function isLessThanFiveMinutesTo($targetTime)
 
     $interval = $fullTarget->getTimestamp() - $now->getTimestamp();
 
-    if ($interval <= 300 && $interval >= 0) {
-        // Subtract 2 minutes (120 seconds)
-        $adjusted = (clone $fullTarget)->modify('-2 minutes');
-        return $adjusted->format('H:i:s');
-    }
-
-    return false;
+    // Subtract 2 minutes (120 seconds)
+    $adjusted = (clone $fullTarget)->modify('-2 minutes');
+    return $adjusted->format('H:i:s');
 }
 
 
@@ -272,18 +222,6 @@ Schedule::call(function () {
                             }
                         }
                     } else if ($bidStage->name == 'sniping') {
-                        if ($bidStage->status !== 'active') {
-                            $bidStage->status = "active";
-                            $bidStage->push();
-
-                            $id = Str::random(10);
-                            $type = 'amber';
-                            $title = 'SNIPING STAGE INITIATED';
-                            $description = "We have moved to the sniping stage now. We will monitor the emails more aggressively (5 seconds), " .
-                                "open tabs for each of the active vehicles when there is 5 minutes left in the auction, then wait for the last 3 to start placing the bids.";
-                            NotificationFromInitAuctionTestEvent::dispatch($id, $type, $title, $description);
-                        }
-
                         $active_accounts = PhillipsAccount::query()->where('status', 'active')
                             ->get();
 
@@ -362,23 +300,26 @@ Schedule::call(function () {
 
                             }
 
-
                             // Start Sniping Job
                             $phillips_account_password = $account->account_password;
-                            $isTimeToInitSniping = isLessThanFiveMinutesTo($activeAuction->end_time);
-                            if ($isTimeToInitSniping !== false) {
-                                if (
-                                    !isInitSnipingRunning($email, $phillips_account_password, $isTimeToInitSniping, $bidStage->id, $account->id, $activeAuction->id)
-                                ) {
-                                    \Log::info("is inside here");
-                                    SnipingJob::dispatch($email, $phillips_account_password, $isTimeToInitSniping, $bidStage->id, $account->id, $activeAuction->id)
-                                        ->onQueue('snipingJob');
-                                }
+
+                            if ($bidStage->status !== 'active') {
+                                $isTimeToInitSniping = triggerTime($activeAuction->end_time);
+                                SnipingJob::dispatch($email, $phillips_account_password, $isTimeToInitSniping, $bidStage->id, $account->id, $activeAuction->id)
+                                    ->onQueue('snipingJob');
+
+                                $bidStage->status = "active";
+                                $bidStage->push();
+
+                                $id = Str::random(10);
+                                $type = 'amber';
+                                $title = 'SNIPING STAGE INITIATED';
+                                $description = "We have moved to the sniping stage now. We will monitor the emails more aggressively (5 seconds), " .
+                                    "open tabs for each of the active vehicles when there is 5 minutes left in the auction, then wait for the last 3 to start placing the bids.";
+                                NotificationFromInitAuctionTestEvent::dispatch($id, $type, $title, $description);
                             }
+
                         }
-
-
-
                     }
                 } else {
                     $bidStage->status = "dormant";
