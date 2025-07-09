@@ -23,31 +23,30 @@ function isEmailProcessRunning($email, $password, $interval)
     return count($output) > 1;
 }
 
-function isInitSnipingRunning($email, $trigger_time, $bid_stage_id, $phillips_account_id, $auction_session_id)
+function isInitSnipingRunning($email, $password, $trigger_time, $bid_stage_id, $phillips_account_id, $auction_session_id)
 {
-    $patternParts = [
-        'node',
-        env('BOT_BASE_PATH') . '/initSniping.js',
-        '--email',
-        $email,
-        '--trigger_time',
-        $trigger_time,
-        '--bid_stage_id',
-        $bid_stage_id,
-        '--phillips_account_id',
-        $phillips_account_id,
-        '--auction_session_id',
-        $auction_session_id
-    ];
+    $pattern =
+        'node' .
+        env('BOT_BASE_PATH') . '/initSniping.js' .
+        ' --email ' .
+        $email .
+        ' --password ' .
+        $password .
+        ' --trigger_time ' .
+        $trigger_time .
+        ' --bid_stage_id ' .
+        $bid_stage_id .
+        ' --phillips_account_id ' .
+        $phillips_account_id .
+        ' --auction_session_id ' .
+        $auction_session_id;
 
-    // Join without the password
-    $pattern = implode(' ', $patternParts);
-    $cmd = "pgrep -a -f " . escapeshellarg($pattern);
+    $escapedPattern = escapeshellarg($pattern);
+    $cmd = "pgrep -f $escapedPattern";
     exec($cmd, $output);
 
     \Log::info("Checking if initSniping is running: $pattern | Matches found: " . count($output));
-
-    return count($output) > 0;
+    return count($output) > 1;
 }
 
 
@@ -322,10 +321,10 @@ Schedule::call(function () {
                             $isTimeToInitSniping = isLessThanFiveMinutesTo($activeAuction->end_time);
                             if ($isTimeToInitSniping !== false) {
                                 if (
-                                    !isInitSnipingRunning($email, $isTimeToInitSniping, $bidStage->id, $account->id, $activeAuction->id)
+                                    !isInitSnipingRunning($email, $phillips_account_password, $isTimeToInitSniping, $bidStage->id, $account->id, $activeAuction->id)
                                 ) {
                                     \Log::info("is inside here");
-                                    SnipingJob::dispatch($email, $isTimeToInitSniping, $bidStage->id, $account->id, $activeAuction->id)
+                                    SnipingJob::dispatch($email, $phillips_account_password, $isTimeToInitSniping, $bidStage->id, $account->id, $activeAuction->id)
                                         ->onQueue('snipingJob');
                                 }
                             }
